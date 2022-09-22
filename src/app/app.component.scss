@@ -1,0 +1,20 @@
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    max-width: 100%;
+    padding: 0px;
+
+}
+
+.header {
+    grid-column: 1 / -1;
+    grid-row: 1 / 2;
+    background: aquamarine;
+}
+
+.dashboard {
+    grid-column: 1 / -1;
+    grid-row: 2 / -1;
+    background: greenyellow;
+}
