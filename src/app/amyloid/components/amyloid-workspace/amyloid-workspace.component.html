@@ -1,1 +1,21 @@
-<p>amyloid-workspace works!</p>
+<button class="btn btn-primary" (click)="test()">Synchronize</button>
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Sequences</th>
+      <th scope="col">Created</th>
+      <th scope="col">Updated</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let workspace of workspaces; index as i">
+      <th scope="row">{{ i + 1 }}</th>
+      <td>{{ workspace.name }}</td>
+      <td>?</td>
+      <td>{{ workspace.created | date: 'dd MMM yyyy hh:mm' }}</td>
+      <td>{{ workspace.updated | date: 'dd MMM yyyy hh:mm' }}</td>
+    </tr>
+  </tbody>
+</table>

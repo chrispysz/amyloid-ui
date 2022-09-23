@@ -1,0 +1,22 @@
+{
+  "workspaces": [
+    {
+      "id": 0,
+      "name": "BASS domains",
+      "creationDate": "2019-03-27T14:00:00.000+0000",
+      "lastModifiedDate": "2019-05-27T14:00:00.000+0000"
+    },
+    {
+      "id": 1,
+      "name": "FASS domains",
+      "creationDate": "2019-03-27T14:00:00.000+0000",
+      "lastModifiedDate": "2019-05-27T14:00:00.000+0000"
+    },
+    {
+      "id": 2,
+      "name": "HET-s domains",
+      "creationDate": "2019-03-27T14:00:00.000+0000",
+      "lastModifiedDate": "2019-05-27T14:00:00.000+0000"
+    }
+  ]
+}
