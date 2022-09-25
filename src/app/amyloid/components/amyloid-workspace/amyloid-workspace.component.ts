@@ -1,24 +1,79 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { map, Observable, pipe, Subject, Subscription, tap } from 'rxjs';
+import { FormsModule, FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-amyloid-workspace',
   templateUrl: './amyloid-workspace.component.html',
-  styleUrls: ['./amyloid-workspace.component.scss']
+  styleUrls: ['./amyloid-workspace.component.scss'],
 })
-export class AmyloidWorkspaceComponent implements OnInit {
-  workspaces: Workspace[] = [];
+export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
+  workspaces$: Observable<Workspace[]> | undefined =
+    this.workspaceService.getAll();
+  workspacesLength$: Observable<number> | undefined = this.workspaces$?.pipe(
+    map((workspaces) => workspaces.length)
+  );
 
-  constructor(private readonly workspaceService: WorkspaceService) {}
+  private readonly refreshRequired$ = new Subject<void>();
 
-  ngOnInit(): void {}
+  workspaceModal = new FormGroup({
+    name: new FormControl('')
+  });
 
-  test(): void {
-    this.workspaceService.getAll().subscribe((workspaces: Workspace[]) => {
-      console.log(workspaces);
-      this.workspaces = workspaces;
+  constructor(
+    private readonly workspaceService: WorkspaceService,
+    private readonly modalService: NgbModal
+  ) {}
+
+  ngOnInit(): void {
+    this.refreshRequired$.subscribe(() => {
+      this.workspaces$ = this.workspaceService.getAll();
+      this.workspacesLength$ = this.workspaces$?.pipe(
+        map((workspaces) => workspaces.length)
+      );
     });
   }
 
+  addWorkspace(workspace: Workspace): void {
+    this.workspaceService.add(workspace).subscribe((object: Object) => {
+      console.log(`Added with response: ${object}`);
+      this.refreshRequired$.next();
+    });
+  }
+
+  open(content: any) {
+    this.modalService
+      .open(content, { ariaLabelledBy: 'modal-basic-title' })
+      .result.then(
+        (result) => {
+          console.log(`Closed with: ${result}`);
+          this.addWorkspace({
+            id: Date.now().toString(),
+            name: result.name,
+            created: new Date().toLocaleString([], {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+            updated: new Date().toLocaleString([], {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+          });
+        },
+        () => {}
+      );
+  }
+
+  ngOnDestroy(): void {
+    this.refreshRequired$.complete();
+  }
 }

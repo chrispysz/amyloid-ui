@@ -4,6 +4,7 @@ import { AmyloidDashboardComponent } from './components/amyloid-dashboard/amyloi
 import { AmyloidWorkspaceComponent } from './components/amyloid-workspace/amyloid-workspace.component';
 import { WorkspaceService } from './services/workspace.service';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 
@@ -15,6 +16,8 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
   ],
   imports: [
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [
     WorkspaceService

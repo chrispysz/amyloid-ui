@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
 import { Workspace } from '../models/workspace';
 
 @Injectable()
 export class WorkspaceService {
-  readonly path = 'https://amylotool-backend.onrender.com/workspaces';
+  private readonly path = 'https://amylotool-backend.onrender.com/workspaces';
 
   constructor(private readonly httpClient: HttpClient) {}
 
@@ -15,5 +15,9 @@ export class WorkspaceService {
 
   getAll(): Observable<Workspace[]> {
     return this.httpClient.get<Workspace[]>(`${this.path}/list`);
+  }
+
+  add(workspace: Workspace): Observable<Object> {
+    return this.httpClient.post(`${this.path}/add`, workspace);
   }
 }

@@ -1,8 +1,49 @@
-<button class="btn btn-primary" (click)="test()">Synchronize</button>
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Workspace details</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="workspaceModal">
+      <div class="mb-3">
+        <label for="workspaceName">Name</label>
+        <div class="input-group">
+          <input
+            formControlName="name"
+            id="workspaceName"
+            class="form-control"
+            type="text"
+          />
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="submit"
+      class="btn btn-outline-dark"
+      (click)="modal.close(workspaceModal.value)"
+    >
+      Save
+    </button>
+  </div>
+</ng-template>
+
+<button class="btn btn-lg btn-outline-primary" (click)="open(content)">
+  New Workspace
+</button>
+
+<hr />
+
 <table class="table table-hover">
   <thead>
     <tr>
-      <th scope="col">#</th>
+      <th scope="col"></th>
       <th scope="col">Name</th>
       <th scope="col">Sequences</th>
       <th scope="col">Created</th>
@@ -10,12 +51,27 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let workspace of workspaces; index as i">
-      <th scope="row">{{ i + 1 }}</th>
-      <td>{{ workspace.name }}</td>
-      <td>?</td>
-      <td>{{ workspace.created | date: 'dd MMM yyyy hh:mm' }}</td>
-      <td>{{ workspace.updated | date: 'dd MMM yyyy hh:mm' }}</td>
-    </tr>
+    <ng-container
+      *ngIf="workspacesLength$ | async as workspacesLength; else noWorkspaces"
+    >
+      <tr *ngFor="let workspace of workspaces$ | async; index as i">
+        <th scope="row">{{ i + 1 }}</th>
+        <td>{{ workspace.name }}</td>
+        <td>?</td>
+        <td>{{ workspace.created }}</td>
+        <td>{{ workspace.updated }}</td>
+      </tr>
+    </ng-container>
   </tbody>
 </table>
+
+<ng-template #noWorkspaces>
+  <div class="d-flex align-items-center">
+    <strong>Loading workspaces. This may take a while...</strong>
+    <div
+      class="spinner-border text-primary"
+      role="status"
+      aria-hidden="true"
+    ></div>
+  </div>
+</ng-template>
