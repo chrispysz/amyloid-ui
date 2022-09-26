@@ -40,11 +40,25 @@
 
 .nav-link {
     color: white;
+    font-weight: bold;
+    font-size: large;
+    margin-right: 10px;
+    margin-left: 10px;
 }
 
 .nav-link.active {
-    border-top: #fee36e;
-    border-top-width: 5px;
-    border-top-style: solid;
+    border-left: #fee36e;
+    border-left-width: 3px;
+    border-left-style: inset;
+
+    border-bottom: #fee36e;
+    border-bottom-width: 3px;
+    border-bottom-style: outset;
+
+    border-radius: 5px;
+
     color: white;
   }
+.navbar-toggler {
+    background-color: #fee36e;
+}
