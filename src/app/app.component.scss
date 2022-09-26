@@ -62,3 +62,9 @@
 .navbar-toggler {
     background-color: #fee36e;
 }
+
+.parent {
+    display: grid;
+    place-content: center;
+    height: 100%;
+}
