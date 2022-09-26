@@ -4,6 +4,7 @@
     grid-template-rows: minmax(0px, auto) minmax(0px, auto);
     max-width: 100%;
     padding: 0px;
+    row-gap: 1px;
 
 }
 
@@ -15,4 +16,35 @@
 .dashboard {
     grid-column: 1 / -1;
     grid-row: 2 / -1;
+    background: #373e98;
 }
+
+.mini-style {
+    color: #ff3370;
+    font-style: bold;
+}
+
+.spaced-left {
+    margin-left: 15px;
+}
+
+.btn-secondary {
+    color: #2a2a2a;
+    font-weight: bold;
+    min-width: 100px;
+}
+
+.btn-label {
+    font-weight: bold;
+}
+
+.nav-link {
+    color: white;
+}
+
+.nav-link.active {
+    border-top: #fee36e;
+    border-top-width: 5px;
+    border-top-style: solid;
+    color: white;
+  }

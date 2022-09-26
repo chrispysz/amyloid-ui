@@ -3,7 +3,12 @@ import { Workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { map, Observable, pipe, Subject, Subscription, tap } from 'rxjs';
-import { FormsModule, FormControl, FormGroup } from '@angular/forms';
+import {
+  FormsModule,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 
 @Component({
   selector: 'app-amyloid-workspace',
@@ -18,9 +23,17 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
   );
 
   private readonly refreshRequired$ = new Subject<void>();
+  private readonly reader = new FileReader();
 
   workspaceModal = new FormGroup({
-    name: new FormControl('')
+    name: new FormControl('', [
+      Validators.required,
+      Validators.minLength(2),
+      Validators.maxLength(30),
+    ]),
+  });
+  workspaceFileImportModal = new FormGroup({
+    importedFile: new FormControl('', [Validators.required]),
   });
 
   constructor(
@@ -49,7 +62,7 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
       .open(content, { ariaLabelledBy: 'modal-basic-title' })
       .result.then(
         (result) => {
-          console.log(`Closed with: ${result}`);
+          console.log(JSON.stringify(result, null, 4));
           this.addWorkspace({
             id: Date.now().toString(),
             name: result.name,
@@ -71,6 +84,21 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
         },
         () => {}
       );
+  }
+
+  onFileChange(event: any) {
+    if (event.target.files.length > 0) {
+      const file = event.target.files[0];
+      console.log(file);
+
+      this.reader.readAsText(file);
+      this.reader.onloadend = () => {
+        console.log(this.reader.result);
+      };
+      this.reader.onprogress = (event) => {
+        console.log(event);
+      };
+    }
   }
 
   ngOnDestroy(): void {

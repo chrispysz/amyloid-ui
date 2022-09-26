@@ -1,6 +1,6 @@
 <ng-template #content let-modal>
   <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Workspace details</h4>
+    <h3 class="modal-title" id="modal-basic-title">Create new Workspace</h3>
     <button
       type="button"
       class="btn-close"
@@ -9,8 +9,9 @@
     ></button>
   </div>
   <div class="modal-body">
-    <form [formGroup]="workspaceModal">
-      <div class="mb-3">
+    <div class="mb-3">
+      <form [formGroup]="workspaceModal">
+        <h5>...from scratch</h5>
         <label for="workspaceName">Name</label>
         <div class="input-group">
           <input
@@ -19,59 +20,93 @@
             class="form-control"
             type="text"
           />
+
+          <div class="container-fluid">
+            <small id="workspaceNameHelperText" class="form-text text-muted">
+              Workspace name must be 2-30 characters long.
+            </small>
+          </div>
         </div>
-      </div>
-    </form>
+        <div class="d-grid d-md-flex justify-content-md-end">
+          <button
+            type="submit"
+            [disabled]="workspaceModal.invalid"
+            class="btn btn btn-outline-primary"
+            (click)="modal.close(workspaceModal.value)"
+          >
+            Create
+          </button>
+        </div>
+      </form>
+      <div class="divider">OR</div>
+      <h5>...import from file</h5>
+      <form [formGroup]="workspaceFileImportModal">
+        <input
+          class="form-control"
+          type="file"
+          formControlName="importedFile"
+          id="importFile"
+          (change)="onFileChange($event)"
+        />
+        <div class="d-grid d-md-flex justify-content-md-end">
+          <button
+            type="submit"
+            [disabled]="workspaceFileImportModal.invalid"
+            class="btn btn-outline-primary"
+            (click)="modal.close(workspaceFileImportModal.value)"
+          >
+            Import
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
-  <div class="modal-footer">
-    <button
-      type="submit"
-      class="btn btn-outline-dark"
-      (click)="modal.close(workspaceModal.value)"
-    >
-      Save
-    </button>
-  </div>
+
+  <div class="modal-footer"></div>
 </ng-template>
+<div class="container">
 
-<button class="btn btn-lg btn-outline-primary" (click)="open(content)">
-  New Workspace
-</button>
+    <button class="btn btn-secondary" style="font-weight: bold;" name="Add workspace" (click)="open(content)">
+      <span class="btn-label" style="font-weight: bold;"><i class="bi bi-folder-plus"></i></span>
+      Add workspace
+    </button>
 
-<hr />
-
-<table class="table table-hover">
-  <thead>
-    <tr>
-      <th scope="col"></th>
-      <th scope="col">Name</th>
-      <th scope="col">Sequences</th>
-      <th scope="col">Created</th>
-      <th scope="col">Updated</th>
-    </tr>
-  </thead>
-  <tbody>
-    <ng-container
-      *ngIf="workspacesLength$ | async as workspacesLength; else noWorkspaces"
-    >
-      <tr *ngFor="let workspace of workspaces$ | async; index as i">
-        <th scope="row">{{ i + 1 }}</th>
-        <td>{{ workspace.name }}</td>
-        <td>?</td>
-        <td>{{ workspace.created }}</td>
-        <td>{{ workspace.updated }}</td>
+  <table class="table table-hover table-striped">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">Name</th>
+        <th scope="col">Sequences</th>
+        <th scope="col">Created</th>
+        <th scope="col">Updated</th>
       </tr>
-    </ng-container>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <ng-container
+        *ngIf="workspacesLength$ | async as workspacesLength; else noWorkspaces"
+      >
+        <tr *ngFor="let workspace of workspaces$ | async; index as i">
+          <th scope="row">{{ i + 1 }}</th>
+          <td>{{ workspace.name }}</td>
+          <td>?</td>
+          <td>{{ workspace.created }}</td>
+          <td>{{ workspace.updated }}</td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</div>
 
 <ng-template #noWorkspaces>
-  <div class="d-flex align-items-center">
+
+  <div class="d-flex justify-content-between">
     <strong>Loading workspaces. This may take a while...</strong>
+    
     <div
-      class="spinner-border text-primary"
+      class="spinner-grow text-secondary"
       role="status"
       aria-hidden="true"
     ></div>
   </div>
+
 </ng-template>
