@@ -5,6 +5,9 @@ import { AmyloidWorkspaceComponent } from './components/amyloid-workspace/amyloi
 import { WorkspaceService } from './services/workspace.service';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SequenceService } from './services/sequence.service';
+import { SubsequenceService } from './services/subsequence.service';
+import { FileProcessingService } from './services/file-processing.service';
 
 
 
@@ -20,7 +23,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     ReactiveFormsModule
   ],
   providers: [
-    WorkspaceService
+    WorkspaceService,
+    SequenceService,
+    SubsequenceService,
+    FileProcessingService
   ],
   exports: [
     AmyloidDashboardComponent,

@@ -3,9 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, tap } from 'rxjs';
 import { Workspace } from '../models/workspace';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class WorkspaceService {
-  private readonly path = 'https://amylotool-backend.onrender.com/workspaces';
+  private readonly path = 'https://amylotool-backend.onrender.com/workspace';
 
   constructor(private readonly httpClient: HttpClient) {}
 
