@@ -2,13 +2,17 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { map, Observable, pipe, Subject, Subscription, tap } from 'rxjs';
+import { map, Observable, of, Subject, concatMap, from, delay } from 'rxjs';
 import {
   FormsModule,
   FormControl,
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { SubsequenceService } from '../../services/subsequence.service';
+import { SequenceService } from '../../services/sequence.service';
+import { FileProcessingService } from '../../services/file-processing.service';
+import { Sequence } from '../../models/sequence';
 
 @Component({
   selector: 'app-amyloid-workspace',
@@ -36,7 +40,15 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
     importedFile: new FormControl('', [Validators.required]),
   });
 
+  validFile: boolean = false;
+  fileImportError: boolean = false;
+  addedSequencesCount: number = 0;
+  addedSequences: Sequence[] = [];
+
   constructor(
+    private readonly subsequenceService: SubsequenceService,
+    private readonly sequenceService: SequenceService,
+    private readonly fileProcessingService: FileProcessingService,
     private readonly workspaceService: WorkspaceService,
     private readonly modalService: NgbModal
   ) {}
@@ -52,10 +64,16 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
 
   addWorkspace(workspace: Workspace): void {
     this.workspaceService.add(workspace).subscribe((object: Object) => {
-      console.log(`Added with response: ${object}`);
+      console.log(`Added with response: ${JSON.stringify(object, null, 4)}`);
       this.refreshRequired$.next();
     });
   }
+
+  // from(sequences)
+  //   .pipe(concatMap((sequence) => this.sequenceService.add(sequence).pipe(delay(1000))))
+  //   .subscribe((object: Object) => {
+  //     console.log(`Added with response: ${JSON.stringify(object, null, 4)}`);
+  //   });
 
   open(content: any) {
     this.modalService
@@ -63,24 +81,51 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
       .result.then(
         (result) => {
           console.log(JSON.stringify(result, null, 4));
-          this.addWorkspace({
-            id: Date.now().toString(),
-            name: result.name,
-            created: new Date().toLocaleString([], {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-            }),
-            updated: new Date().toLocaleString([], {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-            }),
-          });
+          if (result.importedFile) {
+            this.addWorkspace({
+              id: Date.now().toString(),
+              name: this.fileProcessingService.cleanFileName(
+                result.importedFile.toString()
+              ),
+              sequences: this.addedSequences,
+              sequencesCount: this.addedSequencesCount,
+              created: new Date().toLocaleString([], {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+              }),
+              updated: new Date().toLocaleString([], {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+              }),
+            });
+          } else {
+            this.addWorkspace({
+              id: Date.now().toString(),
+              name: result.name,
+              sequences: this.addedSequences,
+              sequencesCount: 0,
+              created: new Date().toLocaleString([], {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+              }),
+              updated: new Date().toLocaleString([], {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+              }),
+            });
+          }
         },
         () => {}
       );
@@ -93,10 +138,27 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
 
       this.reader.readAsText(file);
       this.reader.onloadend = () => {
-        console.log(this.reader.result);
-      };
-      this.reader.onprogress = (event) => {
-        console.log(event);
+        if (
+          this.reader.result &&
+          this.fileProcessingService.fileContentProcessable(
+            this.reader.result.toString()
+          )
+        ) {
+          this.fileImportError = false;
+          this.validFile = true;
+          this.addedSequences =
+            this.fileProcessingService.prepareSequenceObjects(
+              this.reader.result.toString()
+            );
+          this.addedSequencesCount = this.addedSequences.length;
+          console.log(`File content is processable`);
+        } else {
+          this.fileImportError = true;
+          this.validFile = false;
+          this.addedSequences = [];
+          this.addedSequencesCount = 0;
+          console.log(`File content is NOT processable`);
+        }
       };
     }
   }

@@ -16,7 +16,7 @@
 .dashboard {
     grid-column: 1 / -1;
     grid-row: 2 / -1;
-    background: #373e98;
+    background: #6E85B7;
 }
 
 .mini-style {
@@ -49,11 +49,11 @@
 .nav-link.active {
     border-left: #fee36e;
     border-left-width: 3px;
-    border-left-style: inset;
+    border-left-style: solid;
 
     border-bottom: #fee36e;
     border-bottom-width: 3px;
-    border-bottom-style: outset;
+    border-bottom-style: solid;
 
     border-radius: 5px;
 

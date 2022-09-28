@@ -42,7 +42,7 @@
       <h5>...import from file</h5>
       <form [formGroup]="workspaceFileImportModal">
         <input
-          class="form-control"
+          class="form-control bottom-margin"
           type="file"
           formControlName="importedFile"
           id="importFile"
@@ -51,7 +51,7 @@
         <div class="d-grid d-md-flex justify-content-md-end">
           <button
             type="submit"
-            [disabled]="workspaceFileImportModal.invalid"
+            [disabled]="workspaceFileImportModal.invalid || !validFile"
             class="btn btn-outline-primary"
             (click)="modal.close(workspaceFileImportModal.value)"
           >
@@ -62,7 +62,10 @@
     </div>
   </div>
 
-  <div class="modal-footer"></div>
+  <div class="modal-footer">
+    <ng-container *ngIf="validFile; then processableFile; else wrongFile">
+    </ng-container>
+  </div>
 </ng-template>
 <div class="container">
   <button
@@ -70,6 +73,7 @@
     style="font-weight: bold"
     name="Add workspace"
     (click)="open(content)"
+    [disabled]="!(workspacesLength$ | async)"
   >
     <span class="btn-label" style="font-weight: bold"
       ><i class="bi bi-folder-plus"></i
@@ -94,7 +98,7 @@
         <tr *ngFor="let workspace of workspaces$ | async; index as i">
           <th scope="row">{{ i + 1 }}</th>
           <td>{{ workspace.name }}</td>
-          <td>?</td>
+          <td>{{ workspace.sequencesCount }}</td>
           <td>{{ workspace.created }}</td>
           <td>{{ workspace.updated }}</td>
         </tr>
@@ -104,7 +108,17 @@
 </div>
 
 <ng-template #noWorkspaces>
-  <div class="text-left">
-    Loading workspaces. This may take a while...
-</div>
+  <div class="text-left">Loading workspaces. This may take a while...</div>
+</ng-template>
+<ng-template #wrongFile>
+  <div class="alert alert-warning" role="alert">
+    <i class="bi bi-exclamation-triangle"></i> File is not valid.
+    Please make sure it's compliant with FASTA format.
+  </div>
+</ng-template>
+<ng-template #processableFile>
+  <div class="alert alert-success" role="alert">
+    <i class="bi bi-file-earmark-check"></i> File content is valid and Workspace
+    can be created with {{addedSequencesCount}} sequences.
+  </div>
 </ng-template>
