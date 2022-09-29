@@ -4,7 +4,7 @@ import { Observable, Subject, tap } from 'rxjs';
 import { Workspace } from '../models/workspace';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WorkspaceService {
   private readonly path = 'https://amylotool-backend.onrender.com/workspace';

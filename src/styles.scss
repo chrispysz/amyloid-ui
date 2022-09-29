@@ -1,12 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
-$primary: #6E85B7;
+$primary: #6e85b7;
 $secondary: #fee36e;
-$text-primary: #6E85B7;
+$text-primary: #6e85b7;
 $text-secondary: #fee36e;
 
 @import "~bootstrap/scss/bootstrap";
 @import "~bootstrap-icons/font/bootstrap-icons.css";
 
-html { background-color: $primary; }
-
-
+html {
+  background-color: $primary;
+}

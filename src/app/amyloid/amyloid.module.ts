@@ -9,29 +9,23 @@ import { SequenceService } from './services/sequence.service';
 import { SubsequenceService } from './services/subsequence.service';
 import { FileProcessingService } from './services/file-processing.service';
 
-
-
 @NgModule({
   declarations: [
     AmyloidDashboardComponent,
     AmyloidWorkspaceComponent,
-    NotFoundComponent
+    NotFoundComponent,
   ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule
-  ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   providers: [
     WorkspaceService,
     SequenceService,
     SubsequenceService,
-    FileProcessingService
+    FileProcessingService,
   ],
   exports: [
     AmyloidDashboardComponent,
     AmyloidWorkspaceComponent,
-    NotFoundComponent
-  ]
+    NotFoundComponent,
+  ],
 })
-export class AmyloidModule { }
+export class AmyloidModule {}

@@ -11,14 +11,22 @@ const routes: Routes = [
     loadChildren: () =>
       import('./amyloid/amyloid.module').then((module) => module.AmyloidModule),
   },
-  { path: 'amyloid/dashboard', component: AmyloidDashboardComponent, title: 'Dashboard - AmyloTool' },
-  { path: 'amyloid/workspaces', component: AmyloidWorkspaceComponent, title: 'Workspaces - AmyloTool' },
+  {
+    path: 'amyloid/dashboard',
+    component: AmyloidDashboardComponent,
+    title: 'Dashboard - AmyloTool',
+  },
+  {
+    path: 'amyloid/workspaces',
+    component: AmyloidWorkspaceComponent,
+    title: 'Workspaces - AmyloTool',
+  },
   { path: 'not-found', component: NotFoundComponent, title: 'Not Found' },
   { path: '**', redirectTo: 'not-found' },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes),],
-  exports: [RouterModule]
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

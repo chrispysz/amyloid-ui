@@ -8,9 +8,8 @@ describe('AmyloidWorkspaceComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AmyloidWorkspaceComponent ]
-    })
-    .compileComponents();
+      declarations: [AmyloidWorkspaceComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AmyloidWorkspaceComponent);
     component = fixture.componentInstance;

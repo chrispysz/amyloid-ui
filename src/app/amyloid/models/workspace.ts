@@ -1,9 +1,9 @@
-import { Sequence } from "./sequence";
+import { Sequence } from './sequence';
 export interface Workspace {
-    id: string;
-    name: string;
-    sequences: Sequence[];
-    sequencesCount: number;
-    created: string;
-    updated: string;
+  id: string;
+  name: string;
+  sequences: Sequence[];
+  sequencesCount: number;
+  created: string;
+  updated: string;
 }
