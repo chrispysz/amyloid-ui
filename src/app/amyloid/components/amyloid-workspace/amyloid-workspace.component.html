@@ -67,7 +67,7 @@
     </ng-container>
   </div>
 </ng-template>
-<div class="container">
+<div class="container table-responsive">
   <button
     class="btn btn-secondary"
     style="font-weight: bold"
@@ -95,7 +95,8 @@
       <ng-container
         *ngIf="workspacesLength$ | async as workspacesLength; else noWorkspaces"
       >
-        <tr *ngFor="let workspace of workspaces$ | async; index as i">
+        <tr *ngFor="let workspace of workspaces$ | async; index as i"
+        [routerLink]="['/amyloid', workspace.id]">
           <th scope="row">{{ i + 1 }}</th>
           <td>{{ workspace.name }}</td>
           <td>{{ workspace.sequencesCount }}</td>

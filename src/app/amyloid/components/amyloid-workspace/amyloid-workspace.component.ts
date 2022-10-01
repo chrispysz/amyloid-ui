@@ -9,8 +9,7 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { SubsequenceService } from '../../services/subsequence.service';
-import { SequenceService } from '../../services/sequence.service';
+import { PredictionService } from '../../services/prediction.service';
 import { FileProcessingService } from '../../services/file-processing.service';
 import { Sequence } from '../../models/sequence';
 
@@ -46,8 +45,7 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
   addedSequences: Sequence[] = [];
 
   constructor(
-    private readonly subsequenceService: SubsequenceService,
-    private readonly sequenceService: SequenceService,
+    private readonly sequenceService: PredictionService,
     private readonly fileProcessingService: FileProcessingService,
     private readonly workspaceService: WorkspaceService,
     private readonly modalService: NgbModal

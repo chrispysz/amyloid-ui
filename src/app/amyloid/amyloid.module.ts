@@ -5,26 +5,29 @@ import { AmyloidWorkspaceComponent } from './components/amyloid-workspace/amyloi
 import { WorkspaceService } from './services/workspace.service';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SequenceService } from './services/sequence.service';
-import { SubsequenceService } from './services/subsequence.service';
+import { PredictionService } from './services/prediction.service';
 import { FileProcessingService } from './services/file-processing.service';
+import { AmyloidWorkspaceDetailsComponent } from './components/amyloid-workspace-details/amyloid-workspace-details.component';
+import { RouterModule } from '@angular/router';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
     AmyloidDashboardComponent,
     AmyloidWorkspaceComponent,
     NotFoundComponent,
+    AmyloidWorkspaceDetailsComponent,
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgbModule],
   providers: [
     WorkspaceService,
-    SequenceService,
-    SubsequenceService,
-    FileProcessingService,
+    PredictionService,
+    FileProcessingService
   ],
   exports: [
     AmyloidDashboardComponent,
     AmyloidWorkspaceComponent,
+    AmyloidWorkspaceDetailsComponent,
     NotFoundComponent,
   ],
 })
