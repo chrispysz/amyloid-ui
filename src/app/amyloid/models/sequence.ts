@@ -5,4 +5,5 @@ export interface Sequence {
   state: string;
   value: string;
   subsequences: Subsequence[];
+  predictLog: string;
 }

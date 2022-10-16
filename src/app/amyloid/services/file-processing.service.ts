@@ -13,7 +13,6 @@ export class FileProcessingService {
     let indexCounter = 0;
 
     const splitData = fileContent.split('\n');
-    console.log(splitData);
 
     splitData.forEach((line) => {
       if (line.startsWith('>') && line.trim().length) {
@@ -21,14 +20,14 @@ export class FileProcessingService {
         indexCounter += 1;
       }
       if (!line.startsWith('>') && line.trim().length) {
-        const sequence: Sequence = {
+        let sequence: Sequence = {
           id: Date.now().toString() + '-' + indexCounter.toString(),
           name: recentName.replace('>', ''),
           value: this.cleanLine(line),
           state: 'PENDING',
           subsequences: [],
+          predictLog: '',
         };
-        console.log(sequence.name);
         sequences.push(sequence);
       }
     });

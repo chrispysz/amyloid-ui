@@ -26,4 +26,5 @@ export class WorkspaceService {
   update(workspace: Workspace): Observable<Object> {
     return this.httpClient.put(`${this.path}/update`, workspace);
   }
+
 }

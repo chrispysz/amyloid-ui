@@ -6,6 +6,8 @@ import { PredictionService } from '../../services/prediction.service';
 import { from, concatMap } from 'rxjs';
 import { Workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-amyloid-workspace-details',
@@ -22,10 +24,27 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   lastSequenceNumber: number = 0;
   allResults: string = '';
 
+  editActionDescription: string = '';
+  selectedSequenceResults: string = '';
+
+  sequenceDetailsModal = new FormGroup({
+    sequenceIdentifier: new FormControl('', [
+      Validators.required,
+      Validators.minLength(2),
+      Validators.maxLength(30),
+    ]),
+    sequenceValue: new FormControl('', [
+      Validators.required,
+      Validators.minLength(40),
+      Validators.maxLength(500),
+    ]),
+  });
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly predictionService: PredictionService,
-    private readonly workspaceService: WorkspaceService
+    private readonly workspaceService: WorkspaceService,
+    private readonly modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -37,12 +56,59 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       });
   }
 
-  editSequence(sequence: string, id: string): void {
+  showSequencePredictionResults(sequence: string, id: string): void {
     //TODO implement
   }
 
-  showSequencePredictionResults(sequence: string, id: string): void {
-    //TODO implement
+  openEditModal(
+    content: any,
+    actionType: string,
+    seqIdentifier: string,
+    seqValue: string,
+    seqId: string
+  ) {
+    this.editActionDescription = actionType;
+    this.sequenceDetailsModal.controls['sequenceIdentifier'].setValue(
+      seqIdentifier
+    );
+    this.sequenceDetailsModal.controls['sequenceValue'].setValue(seqValue);
+    this.modalService
+      .open(content, { ariaLabelledBy: 'modal-basic-title' })
+      .result.then(
+        (result) => {
+          if (actionType == 'Edit') {
+            this.sequences!.find((s) => s.id == seqId)!.name =
+              result.sequenceIdentifier;
+            this.sequences!.find((s) => s.id == seqId)!.value =
+              result.sequenceValue;
+            this!.workspace!.sequences = this.sequences!;
+            this.workspaceService.update(this.workspace!).subscribe();
+          } else if (actionType == 'Add') {
+            let sequence: Sequence = {
+              id: Date.now().toString(),
+              name: result.sequenceIdentifier,
+              value: result.sequenceValue,
+              state: 'PENDING',
+              subsequences: [],
+              predictLog: '',
+            };
+            this.sequences?.push(sequence);
+            this!.workspace!.sequences = this.sequences!;
+            this.workspaceService.update(this.workspace!).subscribe();
+          }
+        },
+        () => {}
+      );
+  }
+
+  openResultsModal(content: any, results: string) {
+    this.selectedSequenceResults = results;
+    this.modalService
+      .open(content, { ariaLabelledBy: 'modal-basic-title' })
+      .result.then(
+        (result) => {},
+        () => {}
+      );
   }
 
   predict(sequence: string, id: string): void {
@@ -70,6 +136,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             currentSequence?.state != 'POSITIVE'
           ) {
             this.sequences!.find((s) => s.id == id)!.state = 'POSITIVE';
+            this.sequences!.find((s) => s.id == id)!.predictLog =
+              this.allResults;
             this!.workspace!.sequences = this.sequences!;
             this.workspaceService.update(this.workspace!).subscribe();
           } else if (
@@ -77,6 +145,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             currentSequence?.state != 'NEGATIVE'
           ) {
             this.sequences!.find((s) => s.id == id)!.state = 'NEGATIVE';
+            this.sequences!.find((s) => s.id == id)!.predictLog =
+              this.allResults;
             this!.workspace!.sequences = this.sequences!;
             this.workspaceService.update(this.workspace!).subscribe();
           }

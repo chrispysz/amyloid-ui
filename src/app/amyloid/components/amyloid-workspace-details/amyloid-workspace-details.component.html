@@ -1,8 +1,97 @@
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-basic-title">
+      {{ editActionDescription }} sequence
+    </h3>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3">
+      <form [formGroup]="sequenceDetailsModal">
+        <label for="sequenceIdentifier">Identifier</label>
+        <div class="input-group">
+          <input
+            formControlName="sequenceIdentifier"
+            id="sequenceIdentifier"
+            class="form-control"
+            type="text"
+          />
+
+          <div class="container-fluid">
+            <small
+              id="sequenceIdentifierHelperText"
+              class="form-text text-muted"
+            >
+              Sequence identifier must be 2-30 characters long.
+            </small>
+          </div>
+        </div>
+        <div class="container" style="margin-top: 20px"></div>
+        <label for="sequenceValue">Sequence</label>
+        <div class="input-group">
+          <input
+            formControlName="sequenceValue"
+            id="sequenceValue"
+            class="form-control"
+            type="text"
+          />
+
+          <div class="container-fluid">
+            <small
+              id="sequenceIdentifierHelperText"
+              class="form-text text-muted"
+            >
+              Sequence must be 40-500 characters long.
+            </small>
+          </div>
+        </div>
+        <div class="d-grid d-md-flex justify-content-md-end">
+          <button
+            type="submit"
+            [disabled]="sequenceDetailsModal.invalid"
+            class="btn btn btn-outline-primary"
+            (click)="modal.close(sequenceDetailsModal.value)"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-footer"></div>
+</ng-template>
+<ng-template #content2 let-modal>
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-basic-title">Prediction results</h3>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3">
+      <textarea readonly id="predictLogs" rows="10" cols="60">
+        {{ selectedSequenceResults }}
+      </textarea>
+    </div>
+  </div>
+
+  <div class="modal-footer"></div>
+</ng-template>
 <div class="container">
   <button
     class="btn btn-secondary"
     style="font-weight: bold"
     name="Add sequence"
+    (click)="openEditModal(content, 'Add', '', '', '')"
   >
     <span class="btn-label" style="font-weight: bold"
       ><i class="bi bi-folder-plus"></i
@@ -31,7 +120,9 @@
                 name="Predict"
                 (click)="predict(sequence.value, sequence.id)"
                 [disabled]="predictionInProgress"
-                placement="bottom" ngbTooltip="Run prediction for this sequence"
+                style="outline: none; border: none"
+                placement="bottom"
+                ngbTooltip="Run prediction for this sequence"
               >
                 <span class="btn-label"
                   ><i
@@ -43,23 +134,32 @@
               <button
                 class="btn btn-empty"
                 name="Edit"
-                (click)="editSequence(sequence.value, sequence.id)"
+                (click)="
+                  openEditModal(
+                    content,
+                    'Edit',
+                    sequence.name,
+                    sequence.value,
+                    sequence.id
+                  )
+                "
                 [disabled]="predictionInProgress"
-                placement="bottom" ngbTooltip="Edit sequence"
+                style="outline: none; border: none"
+                placement="bottom"
+                ngbTooltip="Edit sequence"
               >
                 <span class="btn-label"
-                  ><i
-                    class="bi bi-pencil-square"
-                    style="font-size: 2rem"
-                  ></i
+                  ><i class="bi bi-pencil-square" style="font-size: 2rem"></i
                 ></span>
               </button>
               <button
                 class="btn btn-empty"
                 name="Results"
-                (click)="showSequencePredictionResults(sequence.value, sequence.id)"
+                (click)="openResultsModal(content2, sequence.predictLog)"
                 [disabled]="predictionInProgress"
-                placement="bottom" ngbTooltip="Display detailed results"
+                style="outline: none; border: none"
+                placement="bottom"
+                ngbTooltip="Display detailed results"
               >
                 <span class="btn-label"
                   ><i
@@ -70,7 +170,9 @@
               </button>
             </td>
             <td>{{ sequence.state }}</td>
-            <td style="word-wrap: break-word; min-width: 200px; max-width: 200px">
+            <td
+              style="word-wrap: break-word; min-width: 200px; max-width: 200px"
+            >
               <ng-container
                 *ngIf="
                   predictionInProgress && idBeingPredicted === sequence.id;
@@ -93,4 +195,3 @@
     </table>
   </div>
 </div>
-
