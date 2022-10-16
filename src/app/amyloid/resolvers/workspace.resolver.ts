@@ -15,7 +15,7 @@ export class WorkspaceResolver implements Resolve<Workspace> {
 
   resolve(route: ActivatedRouteSnapshot): Observable<Workspace> {
     const workspaceId = +route.paramMap.get('id')!;
-    return this.workspaceService.get(workspaceId).pipe(
+    return this.workspaceService.get(workspaceId.toString()).pipe(
       catchError(() => {
         this.router.navigate(['/amyloid/workspaces']);
         return throwError(

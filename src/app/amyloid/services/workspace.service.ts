@@ -11,7 +11,7 @@ export class WorkspaceService {
 
   constructor(private readonly httpClient: HttpClient) {}
 
-  get(id: number): Observable<Workspace> {
+  get(id: string): Observable<Workspace> {
     return this.httpClient.get<Workspace>(`${this.path}/list?${id}`);
   }
 
@@ -27,4 +27,7 @@ export class WorkspaceService {
     return this.httpClient.put(`${this.path}/update`, workspace);
   }
 
+  delete(id: string): Observable<Object> {
+    return this.httpClient.delete(`${this.path}/delete?${id}`);
+  }
 }

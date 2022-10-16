@@ -168,6 +168,19 @@
                   ></i
                 ></span>
               </button>
+              <button
+                class="btn btn-empty"
+                name="Delete"
+                (click)="deleteSequence(sequence.id, sequence.name)"
+                [disabled]="predictionInProgress"
+                style="outline: none; border: none"
+                placement="bottom"
+                ngbTooltip="Delete sequence"
+              >
+                <span class="btn-label"
+                  ><i class="bi bi-trash" style="font-size: 2rem"></i
+                ></span>
+              </button>
             </td>
             <td>{{ sequence.state }}</td>
             <td

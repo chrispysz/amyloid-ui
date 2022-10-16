@@ -12,6 +12,7 @@ import {
 import { PredictionService } from '../../services/prediction.service';
 import { FileProcessingService } from '../../services/file-processing.service';
 import { Sequence } from '../../models/sequence';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-amyloid-workspace',
@@ -48,7 +49,8 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
     private readonly sequenceService: PredictionService,
     private readonly fileProcessingService: FileProcessingService,
     private readonly workspaceService: WorkspaceService,
-    private readonly modalService: NgbModal
+    private readonly modalService: NgbModal,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -61,17 +63,11 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
   }
 
   addWorkspace(workspace: Workspace): void {
-    this.workspaceService.add(workspace).subscribe((object: Object) => {
-      console.log(`Added with response: ${JSON.stringify(object, null, 4)}`);
+    this.workspaceService.add(workspace).subscribe(() => {
       this.refreshRequired$.next();
+      this.toastr.success(`Workspace ${workspace.name} added successfully`);
     });
   }
-
-  // from(sequences)
-  //   .pipe(concatMap((sequence) => this.sequenceService.add(sequence).pipe(delay(1000))))
-  //   .subscribe((object: Object) => {
-  //     console.log(`Added with response: ${JSON.stringify(object, null, 4)}`);
-  //   });
 
   open(content: any) {
     this.modalService

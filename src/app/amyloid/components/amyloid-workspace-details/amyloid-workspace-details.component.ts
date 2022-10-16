@@ -8,6 +8,7 @@ import { Workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-amyloid-workspace-details',
@@ -44,7 +45,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly predictionService: PredictionService,
     private readonly workspaceService: WorkspaceService,
-    private readonly modalService: NgbModal
+    private readonly modalService: NgbModal,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -94,7 +96,11 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             };
             this.sequences?.push(sequence);
             this!.workspace!.sequences = this.sequences!;
-            this.workspaceService.update(this.workspace!).subscribe();
+            this.workspaceService.update(this.workspace!).subscribe(() => {
+              this.toastr.success(
+                `Sequence ${result.sequenceIdentifier} added successfully`
+              );
+            });
           }
         },
         () => {}
@@ -109,6 +115,15 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
         (result) => {},
         () => {}
       );
+  }
+
+  deleteSequence(sequenceId: string, sequenceName: string): void {
+    if (confirm(`Are you sure you want to delete ${sequenceName}?`)) {
+      this.sequences = this.sequences?.filter((s) => s.id != sequenceId);
+      this!.workspace!.sequences = this.sequences!;
+      this.workspaceService.update(this.workspace!).subscribe();
+      this.toastr.success('Sequence deleted successfully');
+    }
   }
 
   predict(sequence: string, id: string): void {
@@ -128,8 +143,6 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       )
       .subscribe((object: Object) => {
         if (this.currentSequenceNumber == this.lastSequenceNumber) {
-          console.log('Finished predicting');
-          console.log(this.allResults);
           let currentSequence = this.sequences!.find((s) => s.id == id);
           if (
             this.allResults.includes('Positive') &&
@@ -139,7 +152,12 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             this.sequences!.find((s) => s.id == id)!.predictLog =
               this.allResults;
             this!.workspace!.sequences = this.sequences!;
-            this.workspaceService.update(this.workspace!).subscribe();
+            this.workspaceService.update(this.workspace!).subscribe(() => {
+              this.toastr.info(
+                this.sequences!.find((s) => s.id == id)!.name,
+                'POSITIVE'
+              );
+            });
           } else if (
             this.allResults.includes('Negative') &&
             currentSequence?.state != 'NEGATIVE'
@@ -148,13 +166,18 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             this.sequences!.find((s) => s.id == id)!.predictLog =
               this.allResults;
             this!.workspace!.sequences = this.sequences!;
-            this.workspaceService.update(this.workspace!).subscribe();
+            this.workspaceService.update(this.workspace!).subscribe(() => {
+              this.toastr.info(
+                this.sequences!.find((s) => s.id == id)!.name,
+                'NEGATIVE'
+              );
+            });
           }
 
           this.resetPredictionProgress();
         } else {
           if (this.currentSequenceNumber < this.lastSequenceNumber) {
-            this.allResults += JSON.stringify(object) + '\n\n';
+            this.allResults += JSON.stringify(object) + '\n';
             this.currentSequenceNumber++;
           }
           this.predictionProgress = Math.round(
