@@ -24,30 +24,8 @@
   margin-left: 1.5em;
 }
 
-.table {
-  background-color: white;
-  border: 1px;
-  border-style: solid;
-  border-color: #2a2a2a;
-}
-
-.table-hover tbody tr:hover td,
-.table-hover tbody tr:hover th {
-  background-color: #2a2a2a;
-  color: white;
-}
-
-.table thead {
-  color: #2a2a2a;
-  background-color: #fee36e;
-}
-
-table > tbody > tr {
-  cursor: pointer;
-}
-
 .container {
-  padding: 30px;
+  padding-top: 30px;
 }
 
 .bottom-margin {

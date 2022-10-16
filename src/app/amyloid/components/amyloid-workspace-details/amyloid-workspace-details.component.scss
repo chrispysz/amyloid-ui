@@ -1,40 +1,14 @@
-.table {
-  background-color: white;
-  border: 1px;
-  border-style: solid;
-  border-color: #2a2a2a;
-}
 
-.table-hover tbody tr:hover td,
-.table-hover tbody tr:hover th {
-  background-color: #2a2a2a;
-  color: white;
-}
-
-.table thead {
-  color: #2a2a2a;
-  background-color: #fee36e;
-}
-
-table > tbody > tr {
-  cursor: pointer;
-}
 
 .btn-secondary{
   margin-top: 30px;
 }
 
-.table-responsive {
-  max-height: 500px;
+.big-icon {
+  min-width: 100px;
+  min-height: 100px;
 }
 
-.btn-empty {
-  color: #2a2a2a;
-  border: 1px;
-  border-style: solid;
-  border-color: #2a2a2a;
-}
-
-.cut-progress {
-  max-width: 500px;
+.container {
+  padding-top: 30px;
 }

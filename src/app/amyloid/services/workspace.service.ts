@@ -7,7 +7,7 @@ import { Workspace } from '../models/workspace';
   providedIn: 'root',
 })
 export class WorkspaceService {
-  private readonly path = 'https://amylotool-backend.onrender.com/workspace';
+  private readonly path = 'https://amylotool-backend.herokuapp.com/workspace';
 
   constructor(private readonly httpClient: HttpClient) {}
 
@@ -21,5 +21,9 @@ export class WorkspaceService {
 
   add(workspace: Workspace): Observable<Object> {
     return this.httpClient.post(`${this.path}/add`, workspace);
+  }
+
+  update(workspace: Workspace): Observable<Object> {
+    return this.httpClient.put(`${this.path}/update`, workspace);
   }
 }

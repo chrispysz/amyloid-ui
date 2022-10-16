@@ -67,7 +67,7 @@
     </ng-container>
   </div>
 </ng-template>
-<div class="container table-responsive">
+<div class="container">
   <button
     class="btn btn-secondary"
     style="font-weight: bold"
@@ -81,31 +81,38 @@
     Add workspace
   </button>
 
-  <table class="table table-hover table-striped">
-    <thead>
-      <tr>
-        <th scope="col"></th>
-        <th scope="col">Name</th>
-        <th scope="col">Sequences</th>
-        <th scope="col">Created</th>
-        <th scope="col">Updated</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container
-        *ngIf="workspacesLength$ | async as workspacesLength; else noWorkspaces"
-      >
-        <tr *ngFor="let workspace of workspaces$ | async; index as i"
-        [routerLink]="['/amyloid', workspace.id]">
-          <th scope="row">{{ i + 1 }}</th>
-          <td>{{ workspace.name }}</td>
-          <td>{{ workspace.sequencesCount }}</td>
-          <td>{{ workspace.created }}</td>
-          <td>{{ workspace.updated }}</td>
+  <div class="table-responsive">
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">Name</th>
+          <th scope="col">Sequences</th>
+          <th scope="col">Created</th>
+          <th scope="col">Updated</th>
         </tr>
-      </ng-container>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <ng-container
+          *ngIf="
+            workspacesLength$ | async as workspacesLength;
+            else noWorkspaces
+          "
+        >
+          <tr
+            *ngFor="let workspace of workspaces$ | async; index as i"
+            [routerLink]="['/amyloid', workspace.id]"
+          >
+            <th scope="row">{{ i + 1 }}</th>
+            <td>{{ workspace.name }}</td>
+            <td>{{ workspace.sequencesCount }}</td>
+            <td>{{ workspace.created }}</td>
+            <td>{{ workspace.updated }}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <ng-template #noWorkspaces>

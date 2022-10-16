@@ -23,11 +23,12 @@ export class FileProcessingService {
       if (!line.startsWith('>') && line.trim().length) {
         const sequence: Sequence = {
           id: Date.now().toString() + '-' + indexCounter.toString(),
-          name: recentName,
+          name: recentName.replace('>', ''),
           value: this.cleanLine(line),
           state: 'PENDING',
           subsequences: [],
         };
+        console.log(sequence.name);
         sequences.push(sequence);
       }
     });

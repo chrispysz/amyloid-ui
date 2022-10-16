@@ -9,7 +9,7 @@ import { Sequence } from '../models/sequence';
 export class PredictionService {
   constructor(private readonly httpClient: HttpClient) {}
 
-  private readonly path = 'https://amylotool-backend.onrender.com/predict';
+  private readonly path = 'https://amylotool-backend.herokuapp.com/predict';
 
   predictSingle(sequence: string): Observable<Object> {
     let data = {"sequence": sequence};
