@@ -143,10 +143,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       )
       .subscribe((object: Object) => {
         if (this.currentSequenceNumber == this.lastSequenceNumber) {
-          let currentSequence = this.sequences!.find((s) => s.id == id);
           if (
-            this.allResults.includes('Positive') &&
-            currentSequence?.state != 'POSITIVE'
+            this.allResults.includes('Positive')
           ) {
             this.sequences!.find((s) => s.id == id)!.state = 'POSITIVE';
             this.sequences!.find((s) => s.id == id)!.predictLog =
@@ -158,10 +156,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
                 'POSITIVE'
               );
             });
-          } else if (
-            this.allResults.includes('Negative') &&
-            currentSequence?.state != 'NEGATIVE'
-          ) {
+          } else {
             this.sequences!.find((s) => s.id == id)!.state = 'NEGATIVE';
             this.sequences!.find((s) => s.id == id)!.predictLog =
               this.allResults;
