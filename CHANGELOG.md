@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.1](https://github.com/chrispysz/amyloid-ui/compare/v0.0.0...v0.0.1) (2022-10-21)
+
+
+### Bug Fixes
+
+* changelog fixes ([f9807de](https://github.com/chrispysz/amyloid-ui/commits/f9807dec5ff5c21f76e4ac838a473213a6d7251f))
+
 ## 0.0.0 (2022-10-21)
 
 
