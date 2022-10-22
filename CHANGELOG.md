@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/chrispysz/amyloid-ui/compare/v0.0.3...v0.1.0) (2022-10-22)
+
+
+### Features
+
+* replace raw text with colored icons in prediction status ([0fbdef8](https://github.com/chrispysz/amyloid-ui/commit/0fbdef82a97a3118dacacef6055334e16a7b3f9a))
+
 ### [0.0.3](https://github.com/chrispysz/amyloid-ui/compare/v0.0.2...v0.0.3) (2022-10-22)
 
 
