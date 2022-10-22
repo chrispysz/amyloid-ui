@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/chrispysz/amyloid-ui/compare/v0.1.0...v0.2.0) (2022-10-22)
+
+
+### Features
+
+* switch to predicting full sequences, improve status display with icons, improve performance ([5b9154f](https://github.com/chrispysz/amyloid-ui/commit/5b9154f1f36a468dc8d88d8267abdc9624c84a22))
+
+
+### Bug Fixes
+
+* cross-linking between deployed demo and  GitHub repo ([97be33d](https://github.com/chrispysz/amyloid-ui/commit/97be33dd8aebe913d943c5c6ff9401dd669e4e6a))
+
 ## [0.1.0](https://github.com/chrispysz/amyloid-ui/compare/v0.0.3...v0.1.0) (2022-10-22)
 
 
