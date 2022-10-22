@@ -184,10 +184,10 @@
                 <i class="bi bi-question" style="font-size: 2rem"></i>
               </div>
               <div *ngIf="sequence.state === 'POSITIVE' && !(predictionInProgress && idBeingPredicted === sequence.id)">
-                <i class="bi bi-chevron-up text-success" style="font-size: 2rem"></i>
+                <i class="bi bi-caret-up-fill text-success" style="font-size: 2rem"></i>
               </div>
               <div *ngIf="sequence.state === 'NEGATIVE' && !(predictionInProgress && idBeingPredicted === sequence.id)">
-                <i class="bi bi-chevron-down text-danger" style="font-size: 2rem"></i>
+                <i class="bi bi-caret-down-fill text-danger" style="font-size: 2rem"></i>
               </div>
               <div *ngIf="
               predictionInProgress && idBeingPredicted === sequence.id" class="spinner-border" role="status">

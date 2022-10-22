@@ -83,13 +83,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             this.sequences!.find((s) => s.id == seqId)!.value =
               result.sequenceValue;
             this.workspace!.sequences = this.sequences!;
-            this.workspace!.updated = new Date().toLocaleString([], {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-            });
+            this.workspace!.updated = this.getCurrentFormattedDate();
             this.workspaceService.update(this.workspace!).subscribe(() => {
               this.toastr.success(
                 `Sequence ${result.sequenceIdentifier} edited successfully`
@@ -106,13 +100,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             };
             this.sequences?.push(sequence);
             this.workspace!.sequences = this.sequences!;
-            this.workspace!.updated = new Date().toLocaleString([], {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-            });
+            this.workspace!.updated = this.getCurrentFormattedDate();
             this.workspaceService.update(this.workspace!).subscribe(() => {
               this.toastr.success(
                 `Sequence ${result.sequenceIdentifier} added successfully`
@@ -138,13 +126,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     if (confirm(`Are you sure you want to delete ${sequenceName}?`)) {
       this.sequences = this.sequences?.filter((s) => s.id != sequenceId);
       this.workspace!.sequences = this.sequences!;
-      this.workspace!.updated = new Date().toLocaleString([], {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
+      this.workspace!.updated = this.getCurrentFormattedDate();
       this.workspaceService.update(this.workspace!).subscribe(() => {
         this.toastr.success('Sequence deleted successfully');
       });
@@ -160,8 +142,10 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       .subscribe((response: PredictionResponse) => {
         if (response.classification == 'Positive') {
           this.sequences!.find((s) => s.id == id)!.state = 'POSITIVE';
-          this.sequences!.find((s) => s.id == id)!.predictLog = response.result.toString();
+          this.sequences!.find((s) => s.id == id)!.predictLog =
+            response.result.toString();
           this!.workspace!.sequences = this.sequences!;
+          this.workspace!.updated = this.getCurrentFormattedDate();
           this.workspaceService.update(this.workspace!).subscribe(() => {
             this.toastr.info(
               this.sequences!.find((s) => s.id == id)!.name,
@@ -170,14 +154,18 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
           });
         } else {
           this.sequences!.find((s) => s.id == id)!.state = 'NEGATIVE';
-          this.sequences!.find((s) => s.id == id)!.predictLog = response.result.toString();
+          this.sequences!.find((s) => s.id == id)!.predictLog =
+            response.result.toString();
           this!.workspace!.sequences = this.sequences!;
-          this.workspaceService.update(this.workspace!).subscribe(() => {
-            this.toastr.info(
-              this.sequences!.find((s) => s.id == id)!.name,
-              'NEGATIVE'
-            );
-          });
+          this.workspace!.updated = this.getCurrentFormattedDate();
+          this.workspaceService
+            .update(this.workspace!)
+            .subscribe(() => {
+              this.toastr.info(
+                this.sequences!.find((s) => s.id == id)!.name,
+                'NEGATIVE'
+              );
+            });
         }
 
         this.resetPredictionProgress();
@@ -189,4 +177,13 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     this.currentSequenceNumber = 1;
   }
 
+  private getCurrentFormattedDate(): string {
+    return new Date().toLocaleString([], {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
 }
