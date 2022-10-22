@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { Sequence } from '../../models/sequence';
 import { PredictionService } from '../../services/prediction.service';
-import { from, concatMap } from 'rxjs';
+import { PredictionResponse } from '../../models/predictionResponse';
 import { Workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -23,7 +23,6 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   predictionProgress: number = 0;
   currentSequenceNumber: number = 1;
   lastSequenceNumber: number = 0;
-  allResults: string = '';
 
   editActionDescription: string = '';
   selectedSequenceResults: string = '';
@@ -149,7 +148,6 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       this.workspaceService.update(this.workspace!).subscribe(() => {
         this.toastr.success('Sequence deleted successfully');
       });
-      
     }
   }
 
@@ -157,78 +155,38 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     this.predictionInProgress = true;
     this.idBeingPredicted = id;
 
-    const sequences40 = this.createSubsequences(sequence);
-
-    this.lastSequenceNumber = sequences40.length;
-
-    this.predictionProgress = Math.round(
-      (this.currentSequenceNumber / this.lastSequenceNumber) * 100
-    );
-    from(sequences40)
-      .pipe(
-        concatMap((sequence) => this.predictionService.predictSingle(sequence))
-      )
-      .subscribe((object: Object) => {
-        if (this.currentSequenceNumber == this.lastSequenceNumber) {
-          if (
-            this.allResults.includes('Positive')
-          ) {
-            this.sequences!.find((s) => s.id == id)!.state = 'POSITIVE';
-            this.sequences!.find((s) => s.id == id)!.predictLog =
-              this.allResults;
-            this!.workspace!.sequences = this.sequences!;
-            this.workspaceService.update(this.workspace!).subscribe(() => {
-              this.toastr.info(
-                this.sequences!.find((s) => s.id == id)!.name,
-                'POSITIVE'
-              );
-            });
-          } else {
-            this.sequences!.find((s) => s.id == id)!.state = 'NEGATIVE';
-            this.sequences!.find((s) => s.id == id)!.predictLog =
-              this.allResults;
-            this!.workspace!.sequences = this.sequences!;
-            this.workspaceService.update(this.workspace!).subscribe(() => {
-              this.toastr.info(
-                this.sequences!.find((s) => s.id == id)!.name,
-                'NEGATIVE'
-              );
-            });
-          }
-
-          this.resetPredictionProgress();
+    this.predictionService
+      .predictFull(sequence)
+      .subscribe((response: PredictionResponse) => {
+        if (response.classification == 'Positive') {
+          this.sequences!.find((s) => s.id == id)!.state = 'POSITIVE';
+          this.sequences!.find((s) => s.id == id)!.predictLog = response.result.toString();
+          this!.workspace!.sequences = this.sequences!;
+          this.workspaceService.update(this.workspace!).subscribe(() => {
+            this.toastr.info(
+              this.sequences!.find((s) => s.id == id)!.name,
+              'POSITIVE'
+            );
+          });
         } else {
-          if (this.currentSequenceNumber < this.lastSequenceNumber) {
-            this.allResults += JSON.stringify(object) + '\n';
-            this.currentSequenceNumber++;
-          }
-          this.predictionProgress = Math.round(
-            (this.currentSequenceNumber / this.lastSequenceNumber) * 100
-          );
+          this.sequences!.find((s) => s.id == id)!.state = 'NEGATIVE';
+          this.sequences!.find((s) => s.id == id)!.predictLog = response.result.toString();
+          this!.workspace!.sequences = this.sequences!;
+          this.workspaceService.update(this.workspace!).subscribe(() => {
+            this.toastr.info(
+              this.sequences!.find((s) => s.id == id)!.name,
+              'NEGATIVE'
+            );
+          });
         }
+
+        this.resetPredictionProgress();
       });
   }
 
   private resetPredictionProgress(): void {
     this.predictionInProgress = false;
-    this.predictionProgress = 0;
     this.currentSequenceNumber = 1;
-    this.allResults = '';
   }
 
-  private createSubsequences(sequence: string): string[] {
-    const sequences40 = [];
-    const characterSplits = sequence.split('');
-    if (characterSplits.length < 40) {
-      sequences40.push(sequence);
-    } else {
-      for (let i = 0; i < characterSplits.length; i++) {
-        let sequence40 = characterSplits.slice(i, i + 40).join('');
-        if (sequence40.length == 40) {
-          sequences40.push(sequence40);
-        }
-      }
-    }
-    return sequences40;
-  }
 }

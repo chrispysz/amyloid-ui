@@ -180,35 +180,25 @@
               </button>
             </td>
             <td>
-              <div *ngIf="sequence.state === 'PENDING'">
+              <div *ngIf="sequence.state === 'PENDING' && !(predictionInProgress && idBeingPredicted === sequence.id)">
                 <i class="bi bi-question" style="font-size: 2rem"></i>
               </div>
-              <div *ngIf="sequence.state === 'POSITIVE'">
+              <div *ngIf="sequence.state === 'POSITIVE' && !(predictionInProgress && idBeingPredicted === sequence.id)">
                 <i class="bi bi-chevron-up text-success" style="font-size: 2rem"></i>
               </div>
-              <div *ngIf="sequence.state === 'NEGATIVE'">
+              <div *ngIf="sequence.state === 'NEGATIVE' && !(predictionInProgress && idBeingPredicted === sequence.id)">
                 <i class="bi bi-chevron-down text-danger" style="font-size: 2rem"></i>
+              </div>
+              <div *ngIf="
+              predictionInProgress && idBeingPredicted === sequence.id" class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
               </div>
             </td>
             <td
               style="word-wrap: break-word; min-width: 200px; max-width: 200px"
             >
-              <ng-container
-                *ngIf="
-                  predictionInProgress && idBeingPredicted === sequence.id;
-                  else sequenceValue
-                "
-              >
-                <div>
-                  <ngb-progressbar type="success" [value]="predictionProgress"
-                    >Predicting sequence
-                    <b>{{ currentSequenceNumber }}/{{ lastSequenceNumber }}</b
-                    >...</ngb-progressbar
-                  >
-                </div>
-              </ng-container>
+              {{ sequence.value }}
             </td>
-            <ng-template #sequenceValue>{{ sequence.value }}</ng-template>
           </tr>
         </ng-container>
       </tbody>
