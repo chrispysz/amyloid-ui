@@ -105,7 +105,7 @@
           <th scope="col"></th>
           <th scope="col">Identifier</th>
           <th scope="col">Actions</th>
-          <th scope="col">State</th>
+          <th scope="col">Status</th>
           <th scope="col">Sequence</th>
         </tr>
       </thead>
@@ -127,7 +127,7 @@
                 <span class="btn-label"
                   ><i
                     class="bi bi-fast-forward-circle"
-                    style="font-size: 2rem"
+                    style="font-size: 1.5rem"
                   ></i
                 ></span>
               </button>
@@ -149,7 +149,7 @@
                 ngbTooltip="Edit sequence"
               >
                 <span class="btn-label"
-                  ><i class="bi bi-pencil-square" style="font-size: 2rem"></i
+                  ><i class="bi bi-pencil-square" style="font-size: 1.5rem"></i
                 ></span>
               </button>
               <button
@@ -162,10 +162,7 @@
                 ngbTooltip="Display detailed results"
               >
                 <span class="btn-label"
-                  ><i
-                    class="bi bi-file-earmark-binary"
-                    style="font-size: 2rem"
-                  ></i
+                  ><i class="bi bi-eye" style="font-size: 1.5rem"></i
                 ></span>
               </button>
               <button
@@ -178,11 +175,21 @@
                 ngbTooltip="Delete sequence"
               >
                 <span class="btn-label"
-                  ><i class="bi bi-trash" style="font-size: 2rem"></i
+                  ><i class="bi bi-trash" style="font-size: 1.5rem"></i
                 ></span>
               </button>
             </td>
-            <td>{{ sequence.state }}</td>
+            <td>
+              <div *ngIf="sequence.state === 'PENDING'">
+                <i class="bi bi-question" style="font-size: 2rem"></i>
+              </div>
+              <div *ngIf="sequence.state === 'POSITIVE'">
+                <i class="bi bi-chevron-up text-success" style="font-size: 2rem"></i>
+              </div>
+              <div *ngIf="sequence.state === 'NEGATIVE'">
+                <i class="bi bi-chevron-down text-danger" style="font-size: 2rem"></i>
+              </div>
+            </td>
             <td
               style="word-wrap: break-word; min-width: 200px; max-width: 200px"
             >
