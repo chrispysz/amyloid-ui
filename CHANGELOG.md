@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/chrispysz/amyloid-ui/compare/v0.2.0...v0.3.0) (2022-10-22)
+
+
+### Features
+
+* add option for predicting entire workspace, improve status icon readability ([d8aac56](https://github.com/chrispysz/amyloid-ui/commit/d8aac561329264492056765ad7123f61f8b740d2))
+
+
+### Bug Fixes
+
+* update "lastUpdated" after prediction, improve styling ([6e43423](https://github.com/chrispysz/amyloid-ui/commit/6e4342350dc8d2fa7a9bf9770f151f6a62b962ae))
+
 ## [0.2.0](https://github.com/chrispysz/amyloid-ui/compare/v0.1.0...v0.2.0) (2022-10-22)
 
 
