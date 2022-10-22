@@ -87,16 +87,32 @@
   <div class="modal-footer"></div>
 </ng-template>
 <div class="container">
+  <div *ngIf="predictionProgress > 0">
+    <p><ngb-progressbar style="background: #6e85b7;" [animated]="true" type="success" [value]="predictionProgress" [striped]="true"><i>{{predictionProgress}}%</i></ngb-progressbar></p>
+  </div>
   <button
     class="btn btn-secondary"
-    style="font-weight: bold"
+    style="font-weight: bold; border-radius: 0px; border-top-left-radius: 15px; margin-left: 1px; margin-right: 1px;"
     name="Add sequence"
+    [disabled]="predictionInProgress"
     (click)="openEditModal(content, 'Add', '', '', '')"
   >
     <span class="btn-label" style="font-weight: bold"
       ><i class="bi bi-folder-plus"></i
     ></span>
     Add sequence
+  </button>
+  <button
+    class="btn btn-secondary"
+    style="font-weight: bold; border-radius: 0px; border-top-right-radius: 15px;"
+    name="Predict all"
+    [disabled]="predictionInProgress"
+    (click)="predictAll()"
+  >
+    <span class="btn-label" style="font-weight: bold"
+      ><i class="bi bi-play"></i
+    ></span>
+    Predict all
   </button>
   <div class="table-responsive">
     <table class="table table-hover table-striped">
@@ -120,15 +136,12 @@
                 name="Predict"
                 (click)="predict(sequence.value, sequence.id)"
                 [disabled]="predictionInProgress"
-                style="outline: none; border: none"
+                style="outline: none; border: none; padding: 0px; margin-right: 5px;"
                 placement="bottom"
                 ngbTooltip="Run prediction for this sequence"
               >
                 <span class="btn-label"
-                  ><i
-                    class="bi bi-fast-forward-circle"
-                    style="font-size: 1.5rem"
-                  ></i
+                  ><i class="bi bi-play-circle" style="font-size: 1.5rem"></i
                 ></span>
               </button>
               <button
@@ -144,7 +157,7 @@
                   )
                 "
                 [disabled]="predictionInProgress"
-                style="outline: none; border: none"
+                style="outline: none; border: none;  padding: 5px;"
                 placement="bottom"
                 ngbTooltip="Edit sequence"
               >
@@ -157,7 +170,7 @@
                 name="Results"
                 (click)="openResultsModal(content2, sequence.predictLog)"
                 [disabled]="predictionInProgress"
-                style="outline: none; border: none"
+                style="outline: none; border: none;  padding: 5px;"
                 placement="bottom"
                 ngbTooltip="Display detailed results"
               >
@@ -170,7 +183,7 @@
                 name="Delete"
                 (click)="deleteSequence(sequence.id, sequence.name)"
                 [disabled]="predictionInProgress"
-                style="outline: none; border: none"
+                style="outline: none; border: none;  padding: 5px;"
                 placement="bottom"
                 ngbTooltip="Delete sequence"
               >
@@ -180,17 +193,41 @@
               </button>
             </td>
             <td>
-              <div *ngIf="sequence.state === 'PENDING' && !(predictionInProgress && idBeingPredicted === sequence.id)">
-                <i class="bi bi-question" style="font-size: 2rem"></i>
+              <div
+                *ngIf="
+                  sequence.state === 'PENDING' &&
+                  !(predictionInProgress && idBeingPredicted === sequence.id)
+                "
+              >
+                <i class="bi bi-question-circle" style="font-size: 2rem"></i>
               </div>
-              <div *ngIf="sequence.state === 'POSITIVE' && !(predictionInProgress && idBeingPredicted === sequence.id)">
-                <i class="bi bi-caret-up-fill text-success" style="font-size: 2rem"></i>
+              <div
+                *ngIf="
+                  sequence.state === 'POSITIVE' &&
+                  !(predictionInProgress && idBeingPredicted === sequence.id)
+                "
+              >
+                <i
+                  class="bi bi-check-circle text-success"
+                  style="font-size: 2rem"
+                ></i>
               </div>
-              <div *ngIf="sequence.state === 'NEGATIVE' && !(predictionInProgress && idBeingPredicted === sequence.id)">
-                <i class="bi bi-caret-down-fill text-danger" style="font-size: 2rem"></i>
+              <div
+                *ngIf="
+                  sequence.state === 'NEGATIVE' &&
+                  !(predictionInProgress && idBeingPredicted === sequence.id)
+                "
+              >
+                <i
+                  class="bi bi-dash-circle text-danger"
+                  style="font-size: 2rem"
+                ></i>
               </div>
-              <div *ngIf="
-              predictionInProgress && idBeingPredicted === sequence.id" class="spinner-border" role="status">
+              <div
+                *ngIf="predictionInProgress && idBeingPredicted === sequence.id"
+                class="spinner-border"
+                role="status"
+              >
                 <span class="visually-hidden">Loading...</span>
               </div>
             </td>

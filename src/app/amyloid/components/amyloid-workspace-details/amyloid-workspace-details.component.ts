@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs';
+import { concatMap, from, map } from 'rxjs';
 import { Sequence } from '../../models/sequence';
 import { PredictionService } from '../../services/prediction.service';
 import { PredictionResponse } from '../../models/predictionResponse';
@@ -21,8 +21,6 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   predictionInProgress: boolean = false;
   idBeingPredicted: string | undefined;
   predictionProgress: number = 0;
-  currentSequenceNumber: number = 1;
-  lastSequenceNumber: number = 0;
 
   editActionDescription: string = '';
   selectedSequenceResults: string = '';
@@ -133,6 +131,52 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     }
   }
 
+  predictAll(): void {
+    this.predictionInProgress = true;
+    let currentIndex = 0;
+    let lastIndex = this.sequences!.length - 1;
+
+    const _sequences = from(this.sequences!);
+
+    _sequences
+      .pipe(
+        concatMap((sequence) =>
+          this.predictionService.predictFull(sequence.value)
+        )
+      )
+      .subscribe((response: PredictionResponse) => {
+        if (response.classification == 'Positive') {
+          this.sequences!.find(
+            (s) => s.id == this.sequences![currentIndex].id
+          )!.state = 'POSITIVE';
+          this.sequences!.find(
+            (s) => s.id == this.sequences![currentIndex].id
+          )!.predictLog = response.result.toString();
+          this!.workspace!.sequences = this.sequences!;
+        } else {
+          this.sequences!.find(
+            (s) => s.id == this.sequences![currentIndex].id
+          )!.state = 'NEGATIVE';
+          this.sequences!.find(
+            (s) => s.id == this.sequences![currentIndex].id
+          )!.predictLog = response.result.toString();
+          this!.workspace!.sequences = this.sequences!;
+        }
+
+        if (currentIndex == lastIndex) {
+          this!.workspace!.sequences = this.sequences!;
+          this.workspace!.updated = this.getCurrentFormattedDate();
+          this.workspaceService.update(this.workspace!).subscribe(() => {});
+          this.resetPredictionProgress();
+        } else {
+          currentIndex++;
+          this.predictionProgress = Math.round(
+            (currentIndex / lastIndex) * 100
+          );
+        }
+      });
+  }
+
   predict(sequence: string, id: string): void {
     this.predictionInProgress = true;
     this.idBeingPredicted = id;
@@ -158,14 +202,12 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             response.result.toString();
           this!.workspace!.sequences = this.sequences!;
           this.workspace!.updated = this.getCurrentFormattedDate();
-          this.workspaceService
-            .update(this.workspace!)
-            .subscribe(() => {
-              this.toastr.info(
-                this.sequences!.find((s) => s.id == id)!.name,
-                'NEGATIVE'
-              );
-            });
+          this.workspaceService.update(this.workspace!).subscribe(() => {
+            this.toastr.info(
+              this.sequences!.find((s) => s.id == id)!.name,
+              'NEGATIVE'
+            );
+          });
         }
 
         this.resetPredictionProgress();
@@ -174,7 +216,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
 
   private resetPredictionProgress(): void {
     this.predictionInProgress = false;
-    this.currentSequenceNumber = 1;
+    this.predictionProgress = 0;
   }
 
   private getCurrentFormattedDate(): string {
