@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.2](https://github.com/chrispysz/amyloid-ui/compare/v0.0.1...v0.0.2) (2022-10-22)
+
+
+### Bug Fixes
+
+* imporve route handling, change updateDate on model changes ([5da3775](https://github.com/chrispysz/amyloid-ui/commit/5da37759e4abdf404e6dc2b2d124598f8bc8bc4a))
+
 ### [0.0.1](https://github.com/chrispysz/amyloid-ui/compare/v0.0.0...v0.0.1) (2022-10-21)
 
 
