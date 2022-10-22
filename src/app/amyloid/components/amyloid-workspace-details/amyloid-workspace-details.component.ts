@@ -51,7 +51,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.data
-      .pipe(map((data) => data['workspace'][0]))
+      .pipe(map((data) => data['workspace']))
       .subscribe((result) => {
         this.workspace = result;
         this.sequences = result.sequences;
@@ -83,8 +83,19 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
               result.sequenceIdentifier;
             this.sequences!.find((s) => s.id == seqId)!.value =
               result.sequenceValue;
-            this!.workspace!.sequences = this.sequences!;
-            this.workspaceService.update(this.workspace!).subscribe();
+            this.workspace!.sequences = this.sequences!;
+            this.workspace!.updated = new Date().toLocaleString([], {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            });
+            this.workspaceService.update(this.workspace!).subscribe(() => {
+              this.toastr.success(
+                `Sequence ${result.sequenceIdentifier} edited successfully`
+              );
+            });
           } else if (actionType == 'Add') {
             let sequence: Sequence = {
               id: Date.now().toString(),
@@ -95,7 +106,14 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
               predictLog: '',
             };
             this.sequences?.push(sequence);
-            this!.workspace!.sequences = this.sequences!;
+            this.workspace!.sequences = this.sequences!;
+            this.workspace!.updated = new Date().toLocaleString([], {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            });
             this.workspaceService.update(this.workspace!).subscribe(() => {
               this.toastr.success(
                 `Sequence ${result.sequenceIdentifier} added successfully`
@@ -120,9 +138,18 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   deleteSequence(sequenceId: string, sequenceName: string): void {
     if (confirm(`Are you sure you want to delete ${sequenceName}?`)) {
       this.sequences = this.sequences?.filter((s) => s.id != sequenceId);
-      this!.workspace!.sequences = this.sequences!;
-      this.workspaceService.update(this.workspace!).subscribe();
-      this.toastr.success('Sequence deleted successfully');
+      this.workspace!.sequences = this.sequences!;
+      this.workspace!.updated = new Date().toLocaleString([], {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      this.workspaceService.update(this.workspace!).subscribe(() => {
+        this.toastr.success('Sequence deleted successfully');
+      });
+      
     }
   }
 

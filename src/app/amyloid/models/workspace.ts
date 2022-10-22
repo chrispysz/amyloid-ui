@@ -3,7 +3,6 @@ export interface Workspace {
   id: string;
   name: string;
   sequences: Sequence[];
-  sequencesCount: number;
   created: string;
   updated: string;
 }

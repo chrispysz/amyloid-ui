@@ -82,7 +82,6 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
                 result.importedFile.toString()
               ),
               sequences: this.addedSequences,
-              sequencesCount: this.addedSequencesCount,
               created: new Date().toLocaleString([], {
                 year: 'numeric',
                 month: '2-digit',
@@ -103,7 +102,6 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
               id: Date.now().toString(),
               name: result.name,
               sequences: this.addedSequences,
-              sequencesCount: 0,
               created: new Date().toLocaleString([], {
                 year: 'numeric',
                 month: '2-digit',
@@ -128,7 +126,6 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
   onFileChange(event: any) {
     if (event.target.files.length > 0) {
       const file = event.target.files[0];
-      console.log(file);
 
       this.reader.readAsText(file);
       this.reader.onloadend = () => {

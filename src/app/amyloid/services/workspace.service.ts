@@ -12,7 +12,7 @@ export class WorkspaceService {
   constructor(private readonly httpClient: HttpClient) {}
 
   get(id: string): Observable<Workspace> {
-    return this.httpClient.get<Workspace>(`${this.path}/list?${id}`);
+    return this.httpClient.get<Workspace>(`${this.path}/list?id=${id}`);
   }
 
   getAll(): Observable<Workspace[]> {
