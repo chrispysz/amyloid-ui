@@ -10,6 +10,7 @@ import { FileProcessingService } from './services/file-processing.service';
 import { AmyloidWorkspaceDetailsComponent } from './components/amyloid-workspace-details/amyloid-workspace-details.component';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { AmyloidDetailedResultsComponent } from './components/amyloid-detailed-results/amyloid-detailed-results.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     AmyloidWorkspaceComponent,
     NotFoundComponent,
     AmyloidWorkspaceDetailsComponent,
+    AmyloidDetailedResultsComponent,
   ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgbModule],
   providers: [

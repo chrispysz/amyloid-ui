@@ -21,9 +21,9 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   predictionInProgress: boolean = false;
   idBeingPredicted: string | undefined;
   predictionProgress: number = 0;
+  currentSequence: Sequence | undefined;
 
   editActionDescription: string = '';
-  selectedSequenceResults: string = '';
 
   sequenceDetailsModal = new FormGroup({
     sequenceIdentifier: new FormControl('', [
@@ -110,10 +110,10 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       );
   }
 
-  openResultsModal(content: any, results: string) {
-    this.selectedSequenceResults = results;
+  openResultsModal(content: any, sequence: Sequence) {
+    this.currentSequence = sequence;
     this.modalService
-      .open(content, { ariaLabelledBy: 'modal-basic-title' })
+      .open(content, { ariaLabelledBy: 'modal-basic-title', size: 'xl' })
       .result.then(
         (result) => {},
         () => {}

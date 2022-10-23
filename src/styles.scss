@@ -7,12 +7,17 @@ $text-secondary: #fee36e;
 @import "~bootstrap/scss/bootstrap";
 @import "~bootstrap-icons/font/bootstrap-icons.css";
 
-@import '~ngx-toastr/toastr';
+@import "~ngx-toastr/toastr";
 
 html {
   background-color: $primary;
+  font-family: "Roboto Mono", monospace;
+  font-size: 100%;
 }
-
+body {
+  font-size: 1em;
+  font-family: inherit;
+}
 .table-responsive {
   max-height: 650px;
 }
@@ -35,11 +40,11 @@ html {
 }
 
 .table td {
-  vertical-align : middle;
+  vertical-align: middle;
 }
 
 .table th {
-  vertical-align : middle;
+  vertical-align: middle;
 }
 
 table > tbody > tr {

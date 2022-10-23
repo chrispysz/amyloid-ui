@@ -77,11 +77,12 @@
     ></button>
   </div>
   <div class="modal-body">
-    <div class="mb-3">
+    <app-amyloid-detailed-results [sequence]="currentSequence"></app-amyloid-detailed-results>
+    <!-- <div class="mb-3">
       <textarea readonly id="predictLogs" rows="10" cols="60">
         {{ selectedSequenceResults }}
       </textarea>
-    </div>
+    </div> -->
   </div>
 
   <div class="modal-footer"></div>
@@ -168,7 +169,7 @@
               <button
                 class="btn btn-empty"
                 name="Results"
-                (click)="openResultsModal(content2, sequence.predictLog)"
+                (click)="openResultsModal(content2, sequence)"
                 [disabled]="predictionInProgress"
                 style="outline: none; border: none;  padding: 5px;"
                 placement="bottom"
