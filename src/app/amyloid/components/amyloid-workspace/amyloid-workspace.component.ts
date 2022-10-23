@@ -62,6 +62,15 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
     });
   }
 
+  private resetModalData(): void {
+    this.workspaceModal.reset();
+    this.workspaceFileImportModal.reset();
+    this.validFile = false;
+  this.fileImportError = false;
+  this.addedSequencesCount = 0;
+  this.addedSequences = [];
+  }
+
   addWorkspace(workspace: Workspace): void {
     this.workspaceService.add(workspace).subscribe(() => {
       this.refreshRequired$.next();
@@ -74,7 +83,6 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
       .open(content, { ariaLabelledBy: 'modal-basic-title' })
       .result.then(
         (result) => {
-          console.log(JSON.stringify(result, null, 4));
           if (result.importedFile) {
             this.addWorkspace({
               id: Date.now().toString(),
@@ -118,8 +126,9 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
               }),
             });
           }
+          this.resetModalData();
         },
-        () => {}
+        () => {this.resetModalData();}
       );
   }
 
@@ -142,13 +151,11 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
               this.reader.result.toString()
             );
           this.addedSequencesCount = this.addedSequences.length;
-          console.log(`File content is processable`);
         } else {
           this.fileImportError = true;
           this.validFile = false;
           this.addedSequences = [];
           this.addedSequencesCount = 0;
-          console.log(`File content is NOT processable`);
         }
       };
     }
