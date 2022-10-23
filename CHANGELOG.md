@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/chrispysz/amyloid-ui/compare/v0.3.0...v0.4.0) (2022-10-23)
+
+
+### Features
+
+* improve detailed view ([1eff0d6](https://github.com/chrispysz/amyloid-ui/commit/1eff0d69d0a4ae6994dc846f9491883b94d4eb84))
+
+
+### Bug Fixes
+
+* remove incorrect behavior when adding workspace from file ([9ed1aad](https://github.com/chrispysz/amyloid-ui/commit/9ed1aad7265e42b251664cce52f8d6662915bc46))
+
 ## [0.3.0](https://github.com/chrispysz/amyloid-ui/compare/v0.2.0...v0.3.0) (2022-10-22)
 
 
