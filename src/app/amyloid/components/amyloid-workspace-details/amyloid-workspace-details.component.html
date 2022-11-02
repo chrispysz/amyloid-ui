@@ -77,7 +77,9 @@
     ></button>
   </div>
   <div class="modal-body">
-    <app-amyloid-detailed-results [sequence]="currentSequence"></app-amyloid-detailed-results>
+    <app-amyloid-detailed-results
+      [sequence]="currentSequence"
+    ></app-amyloid-detailed-results>
     <!-- <div class="mb-3">
       <textarea readonly id="predictLogs" rows="10" cols="60">
         {{ selectedSequenceResults }}
@@ -89,11 +91,26 @@
 </ng-template>
 <div class="container">
   <div *ngIf="predictionProgress > 0">
-    <p><ngb-progressbar style="background: #6e85b7;" [animated]="true" type="success" [value]="predictionProgress" [striped]="true"><i>{{predictionProgress}}%</i></ngb-progressbar></p>
+    <p>
+      <ngb-progressbar
+        style="background: #6e85b7"
+        [animated]="true"
+        type="success"
+        [value]="predictionProgress"
+        [striped]="true"
+        ><i>{{ predictionProgress }}%</i></ngb-progressbar
+      >
+    </p>
   </div>
   <button
     class="btn btn-secondary"
-    style="font-weight: bold; border-radius: 0px; border-top-left-radius: 15px; margin-left: 1px; margin-right: 1px;"
+    style="
+      font-weight: bold;
+      border-radius: 0px;
+      border-top-left-radius: 15px;
+      margin-left: 1px;
+      margin-right: 1px;
+    "
     name="Add sequence"
     [disabled]="predictionInProgress"
     (click)="openEditModal(content, 'Add', '', '', '')"
@@ -105,7 +122,7 @@
   </button>
   <button
     class="btn btn-secondary"
-    style="font-weight: bold; border-radius: 0px; border-top-right-radius: 15px;"
+    style="font-weight: bold; border-radius: 0px"
     name="Predict all"
     [disabled]="predictionInProgress"
     (click)="predictAll()"
@@ -114,6 +131,23 @@
       ><i class="bi bi-play"></i
     ></span>
     Predict all
+  </button>
+  <button
+    class="btn btn-secondary"
+    style="
+      font-weight: bold;
+      border-radius: 0px;
+      border-top-right-radius: 15px;
+      margin-left: 1px;
+    "
+    name="Predict all"
+    [disabled]="predictionInProgress"
+    [routerLink]="['/amyloid/settings', workspace.id]"
+  >
+    <span class="btn-label" style="font-weight: bold"
+      ><i class="bi bi-gear"></i
+    ></span>
+    Settings
   </button>
   <div class="table-responsive">
     <table class="table table-hover table-striped">
@@ -137,7 +171,12 @@
                 name="Predict"
                 (click)="predict(sequence.value, sequence.id)"
                 [disabled]="predictionInProgress"
-                style="outline: none; border: none; padding: 0px; margin-right: 5px;"
+                style="
+                  outline: none;
+                  border: none;
+                  padding: 0px;
+                  margin-right: 5px;
+                "
                 placement="bottom"
                 ngbTooltip="Run prediction for this sequence"
               >
@@ -158,7 +197,7 @@
                   )
                 "
                 [disabled]="predictionInProgress"
-                style="outline: none; border: none;  padding: 5px;"
+                style="outline: none; border: none; padding: 5px"
                 placement="bottom"
                 ngbTooltip="Edit sequence"
               >
@@ -171,7 +210,7 @@
                 name="Results"
                 (click)="openResultsModal(content2, sequence)"
                 [disabled]="predictionInProgress"
-                style="outline: none; border: none;  padding: 5px;"
+                style="outline: none; border: none; padding: 5px"
                 placement="bottom"
                 ngbTooltip="Display detailed results"
               >
@@ -184,7 +223,7 @@
                 name="Delete"
                 (click)="deleteSequence(sequence.id, sequence.name)"
                 [disabled]="predictionInProgress"
-                style="outline: none; border: none;  padding: 5px;"
+                style="outline: none; border: none; padding: 5px"
                 placement="bottom"
                 ngbTooltip="Delete sequence"
               >

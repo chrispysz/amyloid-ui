@@ -1,0 +1,42 @@
+<div
+  class="container"
+  style="background: white; margin-top: 50px; padding: 20px"
+>
+  <div class="mb-3">
+    <form [formGroup]="workspaceSettingsForm">
+      <label for="workspaceName">Name</label>
+      <div class="input-group">
+        <input
+          formControlName="workspaceName"
+          id="workspaceName"
+          class="form-control"
+          type="text"
+        />
+
+        <div class="container-fluid">
+          <small id="sequenceIdentifierHelperText" class="form-text text-muted">
+            Workspace name must be 2-30 characters long.
+          </small>
+        </div>
+      </div>
+      <div class="d-grid d-md-flex justify-content-md-end">
+        <button
+          type="submit"
+          [disabled]="workspaceSettingsForm.invalid"
+          class="btn btn btn-outline-primary"
+          (click)="saveSettings(workspaceSettingsForm.value)"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
+    <button
+      type="button"
+      [disabled]="workspaceSettingsForm.invalid"
+      class="btn btn-outline-danger"
+      (click)="deleteWorkspace()"
+    >
+      Delete workspace
+    </button>
+  </div>
+</div>

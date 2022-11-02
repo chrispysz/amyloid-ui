@@ -73,7 +73,7 @@
     style="font-weight: bold"
     name="Add workspace"
     (click)="open(content)"
-    [disabled]="!(workspacesLength$ | async)"
+    [disabled]="!(workspaces$ | async)"
   >
     <span class="btn-label" style="font-weight: bold"
       ><i class="bi bi-folder-plus"></i
@@ -94,10 +94,7 @@
       </thead>
       <tbody>
         <ng-container
-          *ngIf="
-            workspacesLength$ | async as workspacesLength;
-            else noWorkspaces
-          "
+          *ngIf="workspaces$ | async as workspaces; else noWorkspaces"
         >
           <tr
             *ngFor="let workspace of workspaces$ | async; index as i"

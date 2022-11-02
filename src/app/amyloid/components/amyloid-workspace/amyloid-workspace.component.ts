@@ -22,9 +22,6 @@ import { ToastrService } from 'ngx-toastr';
 export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
   workspaces$: Observable<Workspace[]> | undefined =
     this.workspaceService.getAll();
-  workspacesLength$: Observable<number> | undefined = this.workspaces$?.pipe(
-    map((workspaces) => workspaces.length)
-  );
 
   private readonly refreshRequired$ = new Subject<void>();
   private readonly reader = new FileReader();
@@ -56,9 +53,6 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.refreshRequired$.subscribe(() => {
       this.workspaces$ = this.workspaceService.getAll();
-      this.workspacesLength$ = this.workspaces$?.pipe(
-        map((workspaces) => workspaces.length)
-      );
     });
   }
 
@@ -66,9 +60,9 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
     this.workspaceModal.reset();
     this.workspaceFileImportModal.reset();
     this.validFile = false;
-  this.fileImportError = false;
-  this.addedSequencesCount = 0;
-  this.addedSequences = [];
+    this.fileImportError = false;
+    this.addedSequencesCount = 0;
+    this.addedSequences = [];
   }
 
   addWorkspace(workspace: Workspace): void {
@@ -128,7 +122,9 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
           }
           this.resetModalData();
         },
-        () => {this.resetModalData();}
+        () => {
+          this.resetModalData();
+        }
       );
   }
 

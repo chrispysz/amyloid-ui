@@ -5,6 +5,7 @@ import { NotFoundComponent } from './amyloid/components/not-found/not-found.comp
 import { AmyloidDashboardComponent } from './amyloid/components/amyloid-dashboard/amyloid-dashboard.component';
 import { AmyloidWorkspaceDetailsComponent } from './amyloid/components/amyloid-workspace-details/amyloid-workspace-details.component';
 import { WorkspaceResolver } from './amyloid/resolvers/workspace.resolver';
+import { AmyloidWorkspaceSettingsComponent } from './amyloid/components/amyloid-workspace-settings/amyloid-workspace-settings.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/amyloid/dashboard', pathMatch: 'full' },
@@ -27,6 +28,14 @@ const routes: Routes = [
     path: 'amyloid/:id',
     component: AmyloidWorkspaceDetailsComponent,
     title: 'Workspace details - AmyloTool',
+    resolve: {
+      workspace: WorkspaceResolver,
+    },
+  },
+  {
+    path: 'amyloid/settings/:id',
+    component: AmyloidWorkspaceSettingsComponent,
+    title: 'Workspace settings - AmyloTool',
     resolve: {
       workspace: WorkspaceResolver,
     },

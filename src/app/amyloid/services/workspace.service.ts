@@ -28,6 +28,6 @@ export class WorkspaceService {
   }
 
   delete(id: string): Observable<Object> {
-    return this.httpClient.delete(`${this.path}/delete?${id}`);
+    return this.httpClient.delete(`${this.path}/delete?id=${id}`);
   }
 }

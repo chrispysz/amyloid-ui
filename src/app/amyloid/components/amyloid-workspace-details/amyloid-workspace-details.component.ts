@@ -16,7 +16,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./amyloid-workspace-details.component.scss'],
 })
 export class AmyloidWorkspaceDetailsComponent implements OnInit {
-  workspace: Workspace | undefined;
+  workspace!: Workspace;
   sequences: Sequence[] | undefined;
   predictionInProgress: boolean = false;
   idBeingPredicted: string | undefined;
