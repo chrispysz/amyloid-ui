@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/chrispysz/amyloid-ui/compare/v0.4.0...v0.5.0) (2022-11-02)
+
+
+### Features
+
+* add workspace settings with options to delete and edit workspace ([467e287](https://github.com/chrispysz/amyloid-ui/commit/467e287b4fe0f9f5fda451bc17b6bbfb9d7d1d81))
+
+
+### Bug Fixes
+
+* resolve dependabot alerts ([6601d1b](https://github.com/chrispysz/amyloid-ui/commit/6601d1b86ea1bb552a60cc1d0e25b626da46318a))
+
 ## [0.4.0](https://github.com/chrispysz/amyloid-ui/compare/v0.3.0...v0.4.0) (2022-10-23)
 
 
