@@ -55,10 +55,6 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       });
   }
 
-  showSequencePredictionResults(sequence: string, id: string): void {
-    //TODO implement
-  }
-
   openEditModal(
     content: any,
     actionType: string,
@@ -80,9 +76,9 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
               result.sequenceIdentifier;
             this.sequences!.find((s) => s.id == seqId)!.value =
               result.sequenceValue;
-            this.workspace!.sequences = this.sequences!;
-            this.workspace!.updated = this.getCurrentFormattedDate();
-            this.workspaceService.update(this.workspace!).subscribe(() => {
+            this.workspace.sequences = this.sequences!;
+            this.workspace.updated = this.getCurrentFormattedDate();
+            this.workspaceService.update(this.workspace).subscribe(() => {
               this.toastr.success(
                 `Sequence ${result.sequenceIdentifier} edited successfully`
               );
@@ -97,9 +93,9 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
               predictLog: '',
             };
             this.sequences?.push(sequence);
-            this.workspace!.sequences = this.sequences!;
-            this.workspace!.updated = this.getCurrentFormattedDate();
-            this.workspaceService.update(this.workspace!).subscribe(() => {
+            this.workspace.sequences = this.sequences!;
+            this.workspace.updated = this.getCurrentFormattedDate();
+            this.workspaceService.update(this.workspace).subscribe(() => {
               this.toastr.success(
                 `Sequence ${result.sequenceIdentifier} added successfully`
               );
@@ -123,9 +119,9 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   deleteSequence(sequenceId: string, sequenceName: string): void {
     if (confirm(`Are you sure you want to delete ${sequenceName}?`)) {
       this.sequences = this.sequences?.filter((s) => s.id != sequenceId);
-      this.workspace!.sequences = this.sequences!;
-      this.workspace!.updated = this.getCurrentFormattedDate();
-      this.workspaceService.update(this.workspace!).subscribe(() => {
+      this.workspace.sequences = this.sequences!;
+      this.workspace.updated = this.getCurrentFormattedDate();
+      this.workspaceService.update(this.workspace).subscribe(() => {
         this.toastr.success('Sequence deleted successfully');
       });
     }
@@ -137,6 +133,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     let lastIndex = this.sequences!.length - 1;
 
     const _sequences = from(this.sequences!);
+
+    this.idBeingPredicted = this.sequences![currentIndex].id;
 
     _sequences
       .pipe(
@@ -152,7 +150,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
           this.sequences!.find(
             (s) => s.id == this.sequences![currentIndex].id
           )!.predictLog = response.result.toString();
-          this!.workspace!.sequences = this.sequences!;
+          this.workspace.sequences = this.sequences!;
         } else {
           this.sequences!.find(
             (s) => s.id == this.sequences![currentIndex].id
@@ -160,16 +158,17 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
           this.sequences!.find(
             (s) => s.id == this.sequences![currentIndex].id
           )!.predictLog = response.result.toString();
-          this!.workspace!.sequences = this.sequences!;
+          this.workspace.sequences = this.sequences!;
         }
 
         if (currentIndex == lastIndex) {
-          this!.workspace!.sequences = this.sequences!;
-          this.workspace!.updated = this.getCurrentFormattedDate();
-          this.workspaceService.update(this.workspace!).subscribe(() => {});
+          this.workspace.sequences = this.sequences!;
+          this.workspace.updated = this.getCurrentFormattedDate();
+          this.workspaceService.update(this.workspace).subscribe(() => {});
           this.resetPredictionProgress();
         } else {
           currentIndex++;
+          this.idBeingPredicted = this.sequences![currentIndex].id;
           this.predictionProgress = Math.round(
             (currentIndex / lastIndex) * 100
           );
@@ -188,9 +187,9 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
           this.sequences!.find((s) => s.id == id)!.state = 'POSITIVE';
           this.sequences!.find((s) => s.id == id)!.predictLog =
             response.result.toString();
-          this!.workspace!.sequences = this.sequences!;
-          this.workspace!.updated = this.getCurrentFormattedDate();
-          this.workspaceService.update(this.workspace!).subscribe(() => {
+          this.workspace.sequences = this.sequences!;
+          this.workspace.updated = this.getCurrentFormattedDate();
+          this.workspaceService.update(this.workspace).subscribe(() => {
             this.toastr.info(
               this.sequences!.find((s) => s.id == id)!.name,
               'POSITIVE'
@@ -200,9 +199,9 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
           this.sequences!.find((s) => s.id == id)!.state = 'NEGATIVE';
           this.sequences!.find((s) => s.id == id)!.predictLog =
             response.result.toString();
-          this!.workspace!.sequences = this.sequences!;
-          this.workspace!.updated = this.getCurrentFormattedDate();
-          this.workspaceService.update(this.workspace!).subscribe(() => {
+          this.workspace.sequences = this.sequences!;
+          this.workspace.updated = this.getCurrentFormattedDate();
+          this.workspaceService.update(this.workspace).subscribe(() => {
             this.toastr.info(
               this.sequences!.find((s) => s.id == id)!.name,
               'NEGATIVE'
