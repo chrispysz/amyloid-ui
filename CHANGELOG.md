@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/chrispysz/amyloid-ui/compare/v0.5.0...v0.6.0) (2022-11-08)
+
+
+### Features
+
+* cypress integration ([a969956](https://github.com/chrispysz/amyloid-ui/commit/a9699565c5c8ca9c7657670c905d7856cba83c22))
+
+
+### Bug Fixes
+
+* refactor and prepare for multi-model feature ([237aab6](https://github.com/chrispysz/amyloid-ui/commit/237aab674c96f0d011a9a1e4b8eba2ed7998236d))
+* update spinner behavior for "Predict all" functionality ([74702f4](https://github.com/chrispysz/amyloid-ui/commit/74702f4eec552858c86a455a3825292a6b035d46))
+
 ## [0.5.0](https://github.com/chrispysz/amyloid-ui/compare/v0.4.0...v0.5.0) (2022-11-02)
 
 
