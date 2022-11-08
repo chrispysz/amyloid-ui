@@ -15,8 +15,7 @@ export class AmyloidDetailedResultsComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    let jsonifiedLog = this.sequence!.predictLog.replace(/'/g, '"');
-    this.subsequences = JSON.parse(jsonifiedLog);
+    this.subsequences = JSON.parse(this.sequence!.predictLogs[0].log);
   }
 
   parseFloat(value: string): number {

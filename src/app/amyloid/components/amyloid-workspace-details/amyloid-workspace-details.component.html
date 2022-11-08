@@ -84,6 +84,21 @@
 
   <div class="modal-footer"></div>
 </ng-template>
+<ng-template #content3 let-offcanvas>
+  <div class="offcanvas-header">
+    <h4 class="offcanvas-title" id="offcanvas-basic-title">Model selection</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="offcanvas.dismiss()"
+    ></button>
+  </div>
+  <div class="offcanvas-body">
+    <app-amyloid-model-card (modelSelected)="handleModelClicked($event)">
+    </app-amyloid-model-card>
+  </div>
+</ng-template>
 <div class="container">
   <div *ngIf="predictionProgress > 0">
     <p>
@@ -93,7 +108,7 @@
         type="success"
         [value]="predictionProgress"
         [striped]="true"
-        ><i>{{ predictionProgress }}%</i></ngb-progressbar
+        ><em>{{ predictionProgress }}%</em></ngb-progressbar
       >
     </p>
   </div>
@@ -111,19 +126,31 @@
     (click)="openEditModal(content, 'Add', '', '', '')"
   >
     <span class="btn-label" style="font-weight: bold"
-      ><i class="bi bi-folder-plus"></i
+      ><em class="bi bi-folder-plus"></em
     ></span>
     Add sequence
+  </button>
+  <button
+    class="btn btn-secondary"
+    style="font-weight: bold; margin-right: 1px; border-radius: 0px"
+    name="Select model"
+    [disabled]="predictionInProgress"
+    (click)="openOffCanvas(content3)"
+  >
+    <span class="btn-label" style="font-weight: bold"
+      ><em class="bi bi-robot"></em
+    ></span>
+    Models
   </button>
   <button
     class="btn btn-secondary"
     style="font-weight: bold; border-radius: 0px"
     name="Predict all"
     [disabled]="predictionInProgress"
-    (click)="predictAll()"
+    (click)="predictAll('AmBERT')"
   >
     <span class="btn-label" style="font-weight: bold"
-      ><i class="bi bi-play"></i
+      ><em class="bi bi-play"></em
     ></span>
     Predict all
   </button>
@@ -140,10 +167,11 @@
     [routerLink]="['/amyloid/settings', workspace.id]"
   >
     <span class="btn-label" style="font-weight: bold"
-      ><i class="bi bi-gear"></i
+      ><em class="bi bi-gear"></em
     ></span>
     Settings
   </button>
+
   <div class="table-responsive">
     <table class="table table-hover table-striped">
       <thead>
@@ -164,7 +192,7 @@
               <button
                 class="btn btn-empty"
                 name="Predict"
-                (click)="predict(sequence.value, sequence.id)"
+                (click)="predict(sequence.value, sequence.id, 'AmBERT')"
                 [disabled]="predictionInProgress"
                 style="
                   outline: none;
@@ -176,7 +204,7 @@
                 ngbTooltip="Run prediction for this sequence"
               >
                 <span class="btn-label"
-                  ><i class="bi bi-play-circle" style="font-size: 1.5rem"></i
+                  ><em class="bi bi-play-circle" style="font-size: 1.5rem"></em
                 ></span>
               </button>
               <button
@@ -197,7 +225,10 @@
                 ngbTooltip="Edit sequence"
               >
                 <span class="btn-label"
-                  ><i class="bi bi-pencil-square" style="font-size: 1.5rem"></i
+                  ><em
+                    class="bi bi-pencil-square"
+                    style="font-size: 1.5rem"
+                  ></em
                 ></span>
               </button>
               <button
@@ -210,7 +241,7 @@
                 ngbTooltip="Display detailed results"
               >
                 <span class="btn-label"
-                  ><i class="bi bi-eye" style="font-size: 1.5rem"></i
+                  ><em class="bi bi-eye" style="font-size: 1.5rem"></em
                 ></span>
               </button>
               <button
@@ -223,7 +254,7 @@
                 ngbTooltip="Delete sequence"
               >
                 <span class="btn-label"
-                  ><i class="bi bi-trash" style="font-size: 1.5rem"></i
+                  ><em class="bi bi-trash" style="font-size: 1.5rem"></em
                 ></span>
               </button>
             </td>
@@ -234,7 +265,7 @@
                   !(predictionInProgress && idBeingPredicted === sequence.id)
                 "
               >
-                <i class="bi bi-question-circle" style="font-size: 2rem"></i>
+                <em class="bi bi-question-circle" style="font-size: 2rem"></em>
               </div>
               <div
                 *ngIf="
@@ -242,10 +273,10 @@
                   !(predictionInProgress && idBeingPredicted === sequence.id)
                 "
               >
-                <i
+                <em
                   class="bi bi-check-circle text-success"
                   style="font-size: 2rem"
-                ></i>
+                ></em>
               </div>
               <div
                 *ngIf="
@@ -253,10 +284,10 @@
                   !(predictionInProgress && idBeingPredicted === sequence.id)
                 "
               >
-                <i
+                <em
                   class="bi bi-dash-circle text-danger"
                   style="font-size: 2rem"
-                ></i>
+                ></em>
               </div>
               <div
                 *ngIf="predictionInProgress && idBeingPredicted === sequence.id"

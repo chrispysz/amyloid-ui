@@ -26,7 +26,7 @@ export class FileProcessingService {
           value: this.cleanLine(line),
           state: 'PENDING',
           subsequences: [],
-          predictLog: '',
+          predictLogs: [],
         };
         sequences.push(sequence);
       }

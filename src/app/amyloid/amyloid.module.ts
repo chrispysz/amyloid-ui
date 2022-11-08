@@ -12,6 +12,7 @@ import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AmyloidDetailedResultsComponent } from './components/amyloid-detailed-results/amyloid-detailed-results.component';
 import { AmyloidWorkspaceSettingsComponent } from './components/amyloid-workspace-settings/amyloid-workspace-settings.component';
+import { AmyloidModelCardComponent } from './components/amyloid-model-card/amyloid-model-card.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { AmyloidWorkspaceSettingsComponent } from './components/amyloid-workspac
     AmyloidWorkspaceDetailsComponent,
     AmyloidDetailedResultsComponent,
     AmyloidWorkspaceSettingsComponent,
+    AmyloidModelCardComponent,
   ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, NgbModule],
   providers: [

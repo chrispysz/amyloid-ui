@@ -7,8 +7,9 @@ import { PredictionResponse } from '../../models/predictionResponse';
 import { Workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
+import { ModelData } from '../../models/modelData';
 
 @Component({
   selector: 'app-amyloid-workspace-details',
@@ -43,6 +44,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     private readonly predictionService: PredictionService,
     private readonly workspaceService: WorkspaceService,
     private readonly modalService: NgbModal,
+    private readonly offcanvasService: NgbOffcanvas,
     private toastr: ToastrService
   ) {}
 
@@ -90,7 +92,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
               value: result.sequenceValue,
               state: 'PENDING',
               subsequences: [],
-              predictLog: '',
+              predictLogs: [],
             };
             this.sequences?.push(sequence);
             this.workspace.sequences = this.sequences!;
@@ -116,6 +118,16 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       );
   }
 
+  openOffCanvas(content: any) {
+		this.offcanvasService.open(content, { ariaLabelledBy: 'offcanvas-basic-title' }).result.then(
+			(result) => {
+				
+			},
+			() => {
+			},
+		);
+	}
+
   deleteSequence(sequenceId: string, sequenceName: string): void {
     if (confirm(`Are you sure you want to delete ${sequenceName}?`)) {
       this.sequences = this.sequences?.filter((s) => s.id != sequenceId);
@@ -127,7 +139,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     }
   }
 
-  predictAll(): void {
+  predictAll(model: string): void {
     this.predictionInProgress = true;
     let currentIndex = 0;
     let lastIndex = this.sequences!.length - 1;
@@ -143,28 +155,21 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
         )
       )
       .subscribe((response: PredictionResponse) => {
-        if (response.classification == 'Positive') {
-          this.sequences!.find(
-            (s) => s.id == this.sequences![currentIndex].id
-          )!.state = 'POSITIVE';
-          this.sequences!.find(
-            (s) => s.id == this.sequences![currentIndex].id
-          )!.predictLog = response.result.toString();
-          this.workspace.sequences = this.sequences!;
-        } else {
-          this.sequences!.find(
-            (s) => s.id == this.sequences![currentIndex].id
-          )!.state = 'NEGATIVE';
-          this.sequences!.find(
-            (s) => s.id == this.sequences![currentIndex].id
-          )!.predictLog = response.result.toString();
-          this.workspace.sequences = this.sequences!;
-        }
+        let seq = this.sequences!.find(
+          (s) => s.id == this.sequences![currentIndex].id
+        )!;
+        let newState =
+          response.classification == 'Positive' ? 'POSITIVE' : 'NEGATIVE';
+        seq.state = newState;
+        seq.predictLogs.push({
+          model: model,
+          log: response.result.toString().replace(/'/g, '"'),
+        });
+        this.workspace.sequences = this.sequences!;
 
         if (currentIndex == lastIndex) {
-          this.workspace.sequences = this.sequences!;
           this.workspace.updated = this.getCurrentFormattedDate();
-          this.workspaceService.update(this.workspace).subscribe(() => {});
+          this.workspaceService.update(this.workspace).subscribe();
           this.resetPredictionProgress();
         } else {
           currentIndex++;
@@ -176,38 +181,27 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       });
   }
 
-  predict(sequence: string, id: string): void {
+  predict(sequence: string, id: string, model: string): void {
     this.predictionInProgress = true;
     this.idBeingPredicted = id;
+    let seq = this.sequences!.find((s) => s.id == id)!;
 
     this.predictionService
       .predictFull(sequence)
       .subscribe((response: PredictionResponse) => {
-        if (response.classification == 'Positive') {
-          this.sequences!.find((s) => s.id == id)!.state = 'POSITIVE';
-          this.sequences!.find((s) => s.id == id)!.predictLog =
-            response.result.toString();
-          this.workspace.sequences = this.sequences!;
-          this.workspace.updated = this.getCurrentFormattedDate();
-          this.workspaceService.update(this.workspace).subscribe(() => {
-            this.toastr.info(
-              this.sequences!.find((s) => s.id == id)!.name,
-              'POSITIVE'
-            );
-          });
-        } else {
-          this.sequences!.find((s) => s.id == id)!.state = 'NEGATIVE';
-          this.sequences!.find((s) => s.id == id)!.predictLog =
-            response.result.toString();
-          this.workspace.sequences = this.sequences!;
-          this.workspace.updated = this.getCurrentFormattedDate();
-          this.workspaceService.update(this.workspace).subscribe(() => {
-            this.toastr.info(
-              this.sequences!.find((s) => s.id == id)!.name,
-              'NEGATIVE'
-            );
-          });
-        }
+        let newState =
+          response.classification == 'Positive' ? 'POSITIVE' : 'NEGATIVE';
+        seq.state = newState;
+
+        seq.predictLogs.push({
+          model: model,
+          log: response.result.toString().replace(/'/g, '"'),
+        });
+        this.workspace.sequences = this.sequences!;
+        this.workspace.updated = this.getCurrentFormattedDate();
+        this.workspaceService.update(this.workspace).subscribe(() => {
+          this.toastr.info(seq.name, newState);
+        });
 
         this.resetPredictionProgress();
       });
@@ -226,5 +220,9 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  handleModelClicked(model: ModelData){
+    
   }
 }
