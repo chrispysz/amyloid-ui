@@ -7,7 +7,7 @@ import { Workspace } from '../models/workspace';
   providedIn: 'root',
 })
 export class WorkspaceService {
-  private readonly path = 'https://amylotool-backend.herokuapp.com/workspace';
+  private readonly path = 'http://amylotoolbackend-env.eba-qwm3fz5m.eu-central-1.elasticbeanstalk.com/workspace';
 
   constructor(private readonly httpClient: HttpClient) {}
 
