@@ -1,27 +1,14 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { map, Observable, of, Subject, concatMap, from, delay } from 'rxjs';
-import {
-  FormsModule,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { FileProcessingService } from '../../services/file-processing.service';
 import { Sequence } from '../../models/sequence';
-import { ToastrService } from 'ngx-toastr';
-import {
-  Firestore,
-  collectionData,
-  collection,
-  addDoc,
-  serverTimestamp,
-  Timestamp,
-  FieldValue,
-} from '@angular/fire/firestore';
+import { serverTimestamp } from '@angular/fire/firestore';
 import { AuthService } from '../../services/auth.service';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Component({
   selector: 'app-amyloid-workspace',
@@ -33,11 +20,9 @@ export class AmyloidWorkspaceComponent implements OnInit {
     private readonly fileProcessingService: FileProcessingService,
     private readonly modalService: NgbModal,
     private readonly workspaceService: WorkspaceService,
-    private readonly firestore: Firestore,
     private readonly authService: AuthService
   ) {}
 
-  workspacesCollection = collection(this.firestore, 'workspaces');
   workspaces$: Observable<Workspace[]> | undefined;
 
   private readonly reader = new FileReader();
@@ -67,7 +52,7 @@ export class AmyloidWorkspaceComponent implements OnInit {
     this.workspaces$ = this.workspaceService.getAll();
   }
 
-  loggedIn(): boolean {
+  loggedIn() {
     return this.authService.loggedIn();
   }
 

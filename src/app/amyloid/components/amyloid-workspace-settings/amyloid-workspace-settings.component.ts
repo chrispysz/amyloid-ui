@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { map } from 'rxjs';
+import { map } from 'rxjs/internal/operators/map';
 import { Workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
 
@@ -25,8 +24,7 @@ export class AmyloidWorkspaceSettingsComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly workspaceService: WorkspaceService,
-    private toastr: ToastrService
+    private readonly workspaceService: WorkspaceService
   ) {}
 
   ngOnInit(): void {

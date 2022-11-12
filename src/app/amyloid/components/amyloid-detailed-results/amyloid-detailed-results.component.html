@@ -1,63 +1,41 @@
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-  <li
-    class="nav-item"
-    role="presentation"
-    *ngFor="let log of sequence!.predictLogs"
-  >
-    <button
-      class="nav-link active"
-      id="single-tab"
-      data-bs-toggle="tab"
-      data-bs-target="#single-tab-pane"
-      type="button"
-      role="tab"
-      aria-controls="single-tab-pane"
-      aria-selected="true"
-    >
-      {{log.model}}
-    </button>
-  </li>
-</ul>
-<div class="tab-content" id="myTabContent">
-  <div
-    class="tab-pane fade show active"
-    id="single-tab-pane"
-    role="tabpanel"
-    aria-labelledby="single-tab"
-    tabindex="0"
-  >
-    <div class="table-responsive">
-      <table class="table table-hover table-striped">
-        <thead>
-          <tr>
-            <th scope="col"></th>
-            <th scope="col">Sequence</th>
-            <th scope="col">Status</th>
-            <th scope="col">Predicted value</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let seq of subsequences; index as i">
-            <th scope="row">{{ i + 1 }}</th>
-            <td>{{ seq.sequence }}</td>
-            <td>
-              <div *ngIf="parseFloat(seq.prediction) > 0.5">
-                <em
-                  class="bi bi-check-circle text-success"
-                  style="font-size: 2rem"
-                ></em>
-              </div>
-              <div *ngIf="parseFloat(seq.prediction) <= 0.5">
-                <em
-                  class="bi bi-dash-circle text-danger"
-                  style="font-size: 2rem"
-                ></em>
-              </div>
-            </td>
-            <td>{{ seq.prediction }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<div
+  *ngIf="sequence!.predictLogs.length > 0; else noSeqsForModel"
+  class="table-responsive"
+>
+  <table class="table table-hover table-striped">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">Sequence</th>
+        <th scope="col">Status</th>
+        <th scope="col">Predicted value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let seq of parseJson(sequence!); index as i"
+      >
+        <th scope="row">{{ i + 1 }}</th>
+        <td>{{ seq.sequence }}</td>
+        <td>
+          <div *ngIf="parseFloat(seq.prediction) > 0.5">
+            <em
+              class="bi bi-check-circle text-success"
+              style="font-size: 2rem"
+            ></em>
+          </div>
+          <div *ngIf="parseFloat(seq.prediction) <= 0.5">
+            <em
+              class="bi bi-dash-circle text-danger"
+              style="font-size: 2rem"
+            ></em>
+          </div>
+        </td>
+        <td>{{ seq.prediction }}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
+<ng-template #noSeqsForModel>
+  <div class="text-left">No results for this model</div>
+</ng-template>

@@ -8,16 +8,8 @@ import { Workspace } from '../../models/workspace';
 import { WorkspaceService } from '../../services/workspace.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
 import { ModelData } from '../../models/modelData';
-import {
-  Firestore,
-  collectionData,
-  collection,
-  updateDoc,
-  serverTimestamp,
-  Timestamp,
-} from '@angular/fire/firestore';
+import { serverTimestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-amyloid-workspace-details',
@@ -31,6 +23,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   idBeingPredicted: string | undefined;
   predictionProgress: number = 0;
   currentSequence: Sequence | undefined;
+  logFilteredSequence: Sequence | undefined;
+  currentSelectedModel: string = '';
 
   editActionDescription: string = '';
 
@@ -52,8 +46,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     private readonly predictionService: PredictionService,
     private readonly workspaceService: WorkspaceService,
     private readonly modalService: NgbModal,
-    private readonly offcanvasService: NgbOffcanvas,
-    private toastr: ToastrService
+    private readonly offcanvasService: NgbOffcanvas
   ) {}
 
   ngOnInit(): void {
@@ -110,6 +103,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
 
   openResultsModal(content: any, sequence: Sequence) {
     this.currentSequence = sequence;
+    this.logFilteredSequence = {...this.currentSequence};
+    this.filterLogsByModel('AmBERT');
     this.modalService
       .open(content, { ariaLabelledBy: 'modal-basic-title', size: 'xl' })
       .result.then(
@@ -208,4 +203,16 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   }
 
   handleModelClicked(model: ModelData) {}
+
+  onModelSelect(selection: string) {
+    this.filterLogsByModel(selection);
+
+  }
+
+  filterLogsByModel(model: string) {
+    const selectedLogs = this.currentSequence!.predictLogs.filter(
+      (s) => s.model == model
+    );
+    this.logFilteredSequence!.predictLogs = selectedLogs;
+  }
 }

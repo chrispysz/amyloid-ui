@@ -10,12 +10,12 @@ import { Sequence } from '../../models/sequence';
 export class AmyloidDetailedResultsComponent implements OnInit {
   @Input() sequence: Sequence | undefined;
 
-  subsequences: PredictedSubsequence[] = [];
-
   constructor() {}
 
-  ngOnInit(): void {
-    this.subsequences = JSON.parse(this.sequence!.predictLogs[0].log);
+  ngOnInit(): void {}
+
+  parseJson(value: Sequence): any {
+    return JSON.parse(value.predictLogs[0].log);
   }
 
   parseFloat(value: string): number {

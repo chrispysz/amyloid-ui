@@ -77,12 +77,15 @@
     ></button>
   </div>
   <div class="modal-body">
+    Select a model: 
+    <select #models class="form-select mb-3" style="width: 20%;" (change)="onModelSelect(models.value)" aria-label="Model selection">
+      <option selected value="AmBERT">AmBERT</option>
+      <option value="LSTM">LSTM</option>
+    </select>
     <app-amyloid-detailed-results
-      [sequence]="currentSequence"
+      [sequence]="logFilteredSequence"
     ></app-amyloid-detailed-results>
   </div>
-
-  <div class="modal-footer"></div>
 </ng-template>
 <ng-template #content3 let-offcanvas>
   <div class="offcanvas-header">
