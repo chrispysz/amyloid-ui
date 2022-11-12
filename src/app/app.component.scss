@@ -27,45 +27,8 @@
   margin-left: 15px;
 }
 
-.btn-secondary {
-  color: #2a2a2a;
-  font-weight: bold;
-  min-width: 100px;
-}
-
-.btn-label {
-  font-weight: bold;
-}
-
-.nav-link {
-  color: white;
-  font-weight: bold;
-  font-size: large;
-  margin-right: 10px;
-  margin-left: 10px;
-}
-
-.nav-link.active {
-  border-left: #fee36e;
-  border-left-width: 3px;
-  border-left-style: solid;
-
-  border-bottom: #fee36e;
-  border-bottom-width: 3px;
-  border-bottom-style: solid;
-
-  border-radius: 5px;
-
-  color: white;
-}
-.navbar-toggler {
-  background-color: #fee36e;
-}
-
 .parent {
   display: grid;
   place-content: center;
   height: 100%;
 }
-
-

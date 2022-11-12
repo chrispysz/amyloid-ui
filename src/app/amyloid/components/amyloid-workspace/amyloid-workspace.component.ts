@@ -21,6 +21,7 @@ import {
   Timestamp,
   FieldValue,
 } from '@angular/fire/firestore';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-amyloid-workspace',
@@ -32,8 +33,8 @@ export class AmyloidWorkspaceComponent implements OnInit {
     private readonly fileProcessingService: FileProcessingService,
     private readonly modalService: NgbModal,
     private readonly workspaceService: WorkspaceService,
-    private readonly toastr: ToastrService,
-    private readonly firestore: Firestore
+    private readonly firestore: Firestore,
+    private readonly authService: AuthService
   ) {}
 
   workspacesCollection = collection(this.firestore, 'workspaces');
@@ -52,6 +53,11 @@ export class AmyloidWorkspaceComponent implements OnInit {
     importedFile: new FormControl('', [Validators.required]),
   });
 
+  workspaceLoginForm = new FormGroup({
+    emailInput: new FormControl('', [Validators.required, Validators.email]),
+    passwordInput: new FormControl('', [Validators.required]),
+  });
+
   validFile: boolean = false;
   fileImportError: boolean = false;
   addedSequencesCount: number = 0;
@@ -59,6 +65,14 @@ export class AmyloidWorkspaceComponent implements OnInit {
 
   ngOnInit(): void {
     this.workspaces$ = this.workspaceService.getAll();
+  }
+
+  loggedIn(): boolean {
+    return this.authService.loggedIn();
+  }
+
+  logIn(values: any) {
+    this.authService.logIn(values.emailInput, values.passwordInput);
   }
 
   private resetModalData(): void {

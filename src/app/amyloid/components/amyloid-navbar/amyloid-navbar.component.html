@@ -1,0 +1,52 @@
+<div class="grid-item header">
+  <nav class="navbar navbar-expand-lg bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img
+          src="assets/images/AmyloTool-min.png"
+          alt="Logo"
+          width="60"
+          height="60"
+          class="d-inline-block align-text-top"
+        />
+      </a>
+      <button
+        class="navbar-toggler navbar-toggler-right"
+        type="button"
+        (click)="navbarCollapsed = !navbarCollapsed"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div [ngbCollapse]="navbarCollapsed" class="collapse navbar-collapse">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              routerLinkActive="active"
+              ariaCurrentWhenActive="page"
+              routerLink="amyloid/dashboard"
+              >Dashboard</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              routerLinkActive="active"
+              ariaCurrentWhenActive="page"
+              routerLink="/amyloid/workspaces"
+              >Workspaces</a
+            >
+          </li>
+        </ul>
+        <button
+          *ngIf="loggedIn() as user"
+          class="btn btn-secondary"
+          (click)="logOut()"
+        >
+          Log out
+        </button>
+      </div>
+    </div>
+  </nav>
+</div>
