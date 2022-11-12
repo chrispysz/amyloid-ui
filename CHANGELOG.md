@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.7.0](https://github.com/chrispysz/amyloid-ui/compare/v0.6.0...v0.7.0) (2022-11-12)
+
+
+### Features
+
+* implement FirebaseAuth, login and logout ([ee02eda](https://github.com/chrispysz/amyloid-ui/commit/ee02eda762b11aa2c83844a62042d8212599f1d3))
+
+
+### Bug Fixes
+
+* switch to AWS ([abfa16b](https://github.com/chrispysz/amyloid-ui/commit/abfa16bbf0fed3d6ab921801defae354d7b5a11d))
+* switch to Firebase for CRUD and data storage ([09ed219](https://github.com/chrispysz/amyloid-ui/commit/09ed219dd85a8af4121564ca72e9e187897f9207))
+
 ## [0.6.0](https://github.com/chrispysz/amyloid-ui/compare/v0.5.0...v0.6.0) (2022-11-08)
 
 
