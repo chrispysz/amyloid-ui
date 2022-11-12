@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.1](https://github.com/chrispysz/amyloid-ui/compare/v0.7.0...v0.7.1) (2022-11-12)
+
+
+### Bug Fixes
+
+* increase bundle budget, fix results display for multiple models ([9412d0f](https://github.com/chrispysz/amyloid-ui/commit/9412d0fff094e102475a2541968e67e0e65d2769))
+
 ## [0.7.0](https://github.com/chrispysz/amyloid-ui/compare/v0.6.0...v0.7.0) (2022-11-12)
 
 
