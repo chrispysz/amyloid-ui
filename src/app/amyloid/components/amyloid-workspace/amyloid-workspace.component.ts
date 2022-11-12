@@ -9,21 +9,36 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { PredictionService } from '../../services/prediction.service';
 import { FileProcessingService } from '../../services/file-processing.service';
 import { Sequence } from '../../models/sequence';
 import { ToastrService } from 'ngx-toastr';
+import {
+  Firestore,
+  collectionData,
+  collection,
+  addDoc,
+  serverTimestamp,
+  Timestamp,
+  FieldValue,
+} from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-amyloid-workspace',
   templateUrl: './amyloid-workspace.component.html',
   styleUrls: ['./amyloid-workspace.component.scss'],
 })
-export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
-  workspaces$: Observable<Workspace[]> | undefined =
-    this.workspaceService.getAll();
+export class AmyloidWorkspaceComponent implements OnInit {
+  constructor(
+    private readonly fileProcessingService: FileProcessingService,
+    private readonly modalService: NgbModal,
+    private readonly workspaceService: WorkspaceService,
+    private readonly toastr: ToastrService,
+    private readonly firestore: Firestore
+  ) {}
 
-  private readonly refreshRequired$ = new Subject<void>();
+  workspacesCollection = collection(this.firestore, 'workspaces');
+  workspaces$: Observable<Workspace[]> | undefined;
+
   private readonly reader = new FileReader();
 
   workspaceModal = new FormGroup({
@@ -42,18 +57,8 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
   addedSequencesCount: number = 0;
   addedSequences: Sequence[] = [];
 
-  constructor(
-    private readonly sequenceService: PredictionService,
-    private readonly fileProcessingService: FileProcessingService,
-    private readonly workspaceService: WorkspaceService,
-    private readonly modalService: NgbModal,
-    private toastr: ToastrService
-  ) {}
-
   ngOnInit(): void {
-    this.refreshRequired$.subscribe(() => {
-      this.workspaces$ = this.workspaceService.getAll();
-    });
+    this.workspaces$ = this.workspaceService.getAll();
   }
 
   private resetModalData(): void {
@@ -65,59 +70,28 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
     this.addedSequences = [];
   }
 
-  addWorkspace(workspace: Workspace): void {
-    this.workspaceService.add(workspace).subscribe(() => {
-      this.refreshRequired$.next();
-      this.toastr.success(`Workspace ${workspace.name} added successfully`);
-    });
-  }
-
   open(content: any) {
     this.modalService
       .open(content, { ariaLabelledBy: 'modal-basic-title' })
       .result.then(
         (result) => {
           if (result.importedFile) {
-            this.addWorkspace({
+            this.workspaceService.add({
               id: Date.now().toString(),
               name: this.fileProcessingService.cleanFileName(
                 result.importedFile.toString()
               ),
               sequences: this.addedSequences,
-              created: new Date().toLocaleString([], {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-              }),
-              updated: new Date().toLocaleString([], {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-              }),
+              created: serverTimestamp(),
+              updated: serverTimestamp(),
             });
           } else {
-            this.addWorkspace({
+            this.workspaceService.add({
               id: Date.now().toString(),
               name: result.name,
               sequences: this.addedSequences,
-              created: new Date().toLocaleString([], {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-              }),
-              updated: new Date().toLocaleString([], {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-              }),
+              created: serverTimestamp(),
+              updated: serverTimestamp(),
             });
           }
           this.resetModalData();
@@ -157,7 +131,16 @@ export class AmyloidWorkspaceComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.refreshRequired$.complete();
+  getDateFromTimestamp(timestamp: any): string {
+    if (timestamp.seconds) {
+      return new Date(timestamp.seconds * 1000).toLocaleString([], {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+    return '';
   }
 }

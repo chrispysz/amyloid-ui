@@ -42,9 +42,7 @@ export class AmyloidWorkspaceSettingsComponent implements OnInit {
 
   saveSettings(fields: any): void {
     this.workspace.name = fields.workspaceName;
-    this.workspaceService.update(this.workspace).subscribe(() => {
-      this.toastr.success('Workspace settings saved successfully!');
-    });
+    this.workspaceService.update(this.workspace);
   }
 
   deleteWorkspace(): void {
@@ -53,12 +51,8 @@ export class AmyloidWorkspaceSettingsComponent implements OnInit {
         `Are you sure you want to delete ${this.workspace.name}? This action cannot be undone.`
       )
     ) {
-      this.workspaceService.delete(this.workspace.id).subscribe(() => {
-        this.router.navigate(['/amyloid/workspaces']);
-        this.toastr.success(
-          `Workspace ${this.workspace.name} deleted successfully`
-        );
-      });
+      this.workspaceService.delete(this.workspace);
+      this.router.navigate(['/amyloid/workspaces']);
     }
   }
 }

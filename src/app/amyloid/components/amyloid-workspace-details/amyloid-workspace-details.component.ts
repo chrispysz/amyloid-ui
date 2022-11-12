@@ -10,6 +10,14 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ModelData } from '../../models/modelData';
+import {
+  Firestore,
+  collectionData,
+  collection,
+  updateDoc,
+  serverTimestamp,
+  Timestamp,
+} from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-amyloid-workspace-details',
@@ -79,12 +87,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             this.sequences!.find((s) => s.id == seqId)!.value =
               result.sequenceValue;
             this.workspace.sequences = this.sequences!;
-            this.workspace.updated = this.getCurrentFormattedDate();
-            this.workspaceService.update(this.workspace).subscribe(() => {
-              this.toastr.success(
-                `Sequence ${result.sequenceIdentifier} edited successfully`
-              );
-            });
+            this.workspace.updated = serverTimestamp();
+            this.workspaceService.update(this.workspace);
           } else if (actionType == 'Add') {
             let sequence: Sequence = {
               id: Date.now().toString(),
@@ -96,12 +100,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             };
             this.sequences?.push(sequence);
             this.workspace.sequences = this.sequences!;
-            this.workspace.updated = this.getCurrentFormattedDate();
-            this.workspaceService.update(this.workspace).subscribe(() => {
-              this.toastr.success(
-                `Sequence ${result.sequenceIdentifier} added successfully`
-              );
-            });
+            this.workspace.updated = serverTimestamp();
+            this.workspaceService.update(this.workspace);
           }
         },
         () => {}
@@ -119,23 +119,20 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   }
 
   openOffCanvas(content: any) {
-		this.offcanvasService.open(content, { ariaLabelledBy: 'offcanvas-basic-title' }).result.then(
-			(result) => {
-				
-			},
-			() => {
-			},
-		);
-	}
+    this.offcanvasService
+      .open(content, { ariaLabelledBy: 'offcanvas-basic-title' })
+      .result.then(
+        (result) => {},
+        () => {}
+      );
+  }
 
   deleteSequence(sequenceId: string, sequenceName: string): void {
     if (confirm(`Are you sure you want to delete ${sequenceName}?`)) {
       this.sequences = this.sequences?.filter((s) => s.id != sequenceId);
       this.workspace.sequences = this.sequences!;
-      this.workspace.updated = this.getCurrentFormattedDate();
-      this.workspaceService.update(this.workspace).subscribe(() => {
-        this.toastr.success('Sequence deleted successfully');
-      });
+      this.workspace.updated = serverTimestamp();
+      this.workspaceService.update(this.workspace);
     }
   }
 
@@ -168,8 +165,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
         this.workspace.sequences = this.sequences!;
 
         if (currentIndex == lastIndex) {
-          this.workspace.updated = this.getCurrentFormattedDate();
-          this.workspaceService.update(this.workspace).subscribe();
+          this.workspace.updated = serverTimestamp();
+          this.workspaceService.update(this.workspace);
           this.resetPredictionProgress();
         } else {
           currentIndex++;
@@ -198,10 +195,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
           log: response.result.toString().replace(/'/g, '"'),
         });
         this.workspace.sequences = this.sequences!;
-        this.workspace.updated = this.getCurrentFormattedDate();
-        this.workspaceService.update(this.workspace).subscribe(() => {
-          this.toastr.info(seq.name, newState);
-        });
+        this.workspace.updated = serverTimestamp();
+        this.workspaceService.update(this.workspace);
 
         this.resetPredictionProgress();
       });
@@ -212,17 +207,5 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     this.predictionProgress = 0;
   }
 
-  private getCurrentFormattedDate(): string {
-    return new Date().toLocaleString([], {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  }
-
-  handleModelClicked(model: ModelData){
-    
-  }
+  handleModelClicked(model: ModelData) {}
 }
