@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { concatMap, from, map } from 'rxjs';
+import { catchError, concatMap, from, map, throwError } from 'rxjs';
 import { Sequence } from '../../models/sequence';
 import { PredictionService } from '../../services/prediction.service';
 import { PredictionResponse } from '../../models/predictionResponse';
@@ -24,7 +24,8 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   predictionProgress: number = 0;
   currentSequence: Sequence | undefined;
   logFilteredSequence: Sequence | undefined;
-  currentSelectedModel: string = '';
+  currentSelectedModelForLogs: string = '';
+  currentSelectedModelForPredictions: string = 'AmBERT';
 
   editActionDescription: string = '';
 
@@ -103,7 +104,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
 
   openResultsModal(content: any, sequence: Sequence) {
     this.currentSequence = sequence;
-    this.logFilteredSequence = {...this.currentSequence};
+    this.logFilteredSequence = { ...this.currentSequence };
     this.filterLogsByModel('AmBERT');
     this.modalService
       .open(content, { ariaLabelledBy: 'modal-basic-title', size: 'xl' })
@@ -113,7 +114,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       );
   }
 
-  openOffCanvas(content: any) {
+  openPredictionModelsOffCanvas(content: any) {
     this.offcanvasService
       .open(content, { ariaLabelledBy: 'offcanvas-basic-title' })
       .result.then(
@@ -143,8 +144,15 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     _sequences
       .pipe(
         concatMap((sequence) =>
-          this.predictionService.predictFull(sequence.value)
-        )
+          this.predictionService.predictFull(
+            this.currentSelectedModelForPredictions,
+            sequence.value
+          )
+        ),
+        catchError((error) => {
+          console.error(error);
+          return error;
+        })
       )
       .subscribe((response: PredictionResponse) => {
         let seq = this.sequences!.find(
@@ -179,7 +187,15 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     let seq = this.sequences!.find((s) => s.id == id)!;
 
     this.predictionService
-      .predictFull(sequence)
+      .predictFull(model, sequence)
+      .pipe(
+        catchError(() => {
+          this.resetPredictionProgress();
+          return throwError(
+            () => new Error('Error during prediction for model: ' + model)
+          );
+        })
+      )
       .subscribe((response: PredictionResponse) => {
         let newState =
           response.classification == 'Positive' ? 'POSITIVE' : 'NEGATIVE';
@@ -202,11 +218,12 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     this.predictionProgress = 0;
   }
 
-  handleModelClicked(model: ModelData) {}
+  handleModelClicked(model: ModelData) {
+    this.currentSelectedModelForPredictions = model.name;
+  }
 
-  onModelSelect(selection: string) {
+  onLogModelSelect(selection: string) {
     this.filterLogsByModel(selection);
-
   }
 
   filterLogsByModel(model: string) {

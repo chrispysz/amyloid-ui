@@ -10,18 +10,11 @@ import { PredictionResponse } from '../models/predictionResponse';
 export class PredictionService {
   constructor(private readonly httpClient: HttpClient) {}
 
-  private readonly path = 'http://amylotoolbackend-env.eba-qwm3fz5m.eu-central-1.elasticbeanstalk.com/predict';
+  private readonly path = 'https://amylotool-backend.herokuapp.com/predict';
 
-  predictSingle(sequence: string): Observable<any> {
-    let data = {"sequence": sequence};
+  predictFull(model: string, sequence: string): Observable<any> {
+    let data = { model: model, sequence: sequence };
 
-    return this.httpClient.post(`${this.path}/single`, data);
+    return this.httpClient.post(`${this.path}/model`, data);
   }
-
-  predictFull(sequence: string): Observable<any> {
-    let data = {"sequence": sequence};
-
-    return this.httpClient.post(`${this.path}/full`, data);
-  }
-
 }

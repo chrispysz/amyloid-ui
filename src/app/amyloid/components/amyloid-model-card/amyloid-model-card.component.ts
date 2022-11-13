@@ -20,7 +20,7 @@ export class AmyloidModelCardComponent implements OnInit {
   }
 
   handleModelClick(value: ModelData) {
-    //TODO: add logic to handle model selection
+    this.modelSelected.emit(value);
   }
   
 
