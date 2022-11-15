@@ -77,8 +77,14 @@
     ></button>
   </div>
   <div class="modal-body">
-    Select a model: 
-    <select #models class="form-select mb-3" style="width: 20%;" (change)="onLogModelSelect(models.value)" aria-label="Model selection">
+    Select a model:
+    <select
+      #models
+      class="form-select mb-3"
+      style="width: 20%"
+      (change)="onLogModelSelect(models.value)"
+      aria-label="Model selection"
+    >
       <option selected value="AmBERT">AmBERT</option>
       <option value="LSTM">LSTM</option>
     </select>
@@ -103,18 +109,11 @@
   </div>
 </ng-template>
 <div class="container">
-  <div *ngIf="predictionProgress > 0">
-    <p>
-      <ngb-progressbar
-        style="background: #6e85b7"
-        [animated]="true"
-        type="success"
-        [value]="predictionProgress"
-        [striped]="true"
-        ><em>{{ predictionProgress }}%</em></ngb-progressbar
-      >
-    </p>
-  </div>
+  <app-amyloid-prediction-progress
+    *ngIf="fullPredictionInProgress"
+    [steps]="processSteps"
+  >
+  </app-amyloid-prediction-progress>
   <button
     class="btn btn-secondary"
     style="
@@ -195,7 +194,13 @@
               <button
                 class="btn btn-empty"
                 name="Predict"
-                (click)="predict(sequence.value, sequence.id, currentSelectedModelForPredictions)"
+                (click)="
+                  predict(
+                    sequence.value,
+                    sequence.id,
+                    currentSelectedModelForPredictions
+                  )
+                "
                 [disabled]="predictionInProgress"
                 style="
                   outline: none;

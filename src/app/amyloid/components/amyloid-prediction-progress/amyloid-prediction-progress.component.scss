@@ -1,0 +1,66 @@
+.icon {
+  font-size: 3rem;
+}
+
+.container {
+  background-color: white;
+  padding: 20px;
+  height: 340px;
+  border-radius: 15px;
+}
+
+.loader-one {
+  width: 100%;
+  height: 4.8px;
+  display: inline-block;
+  position: relative;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+.loader-one::after {
+  content: "";
+  width: 192px;
+  height: 4.8px;
+  background: black;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  animation: slide 3s linear infinite;
+}
+.loader-two {
+  width: 100%;
+  height: 4.8px;
+  visibility: hidden;
+  display: inline-block;
+  position: relative;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+.loader-two::after {
+  content: "";
+  width: 192px;
+  height: 4.8px;
+  background: black;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  animation: slide 3s linear 1.5s infinite;
+}
+
+@keyframes slide {
+  0% {
+    visibility: visible;
+    left: 0;
+    transform: translateX(-100%);
+  }
+  50% {
+    left: 100%;
+    transform: translateX(0%);
+  }
+  100% {
+    left: 100%;
+    transform: translateX(0%);
+  }
+}

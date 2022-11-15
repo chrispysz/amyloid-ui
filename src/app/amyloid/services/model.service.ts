@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 export class ModelService {
   models = [
     {
-      id: 1,
+      id: '1',
       name: 'AmBERT',
       description: 'This is a description of AmBERT',
       imageUrl:
@@ -14,7 +14,7 @@ export class ModelService {
       apiPath: 'https://amylotool-backend.herokuapp.com/predict/single',
     },
     {
-      id: 2,
+      id: '2',
       name: 'LSTM',
       description: 'This is a description of LSTM',
       imageUrl:

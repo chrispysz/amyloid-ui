@@ -1,0 +1,107 @@
+<div class="container text-center">
+  <div class="row row-cols-5 g-0 justify-content-center align-items-center">
+    <div class="col">
+      <h4>Establishing connection</h4>
+    </div>
+    <div class="col"></div>
+    <div class="col">
+      <h4>Running prediction</h4>
+    </div>
+    <div class="col"></div>
+    <div class="col">
+      <h4>Saving results</h4>
+    </div>
+  </div>
+  <div class="row row-cols-5 g-0 justify-content-center align-items-center">
+    <div class="col">
+      <i
+        [class]="getStepClass(steps[0])"
+        *ngIf="steps[0].status !== 'IN_PROGRESS'"
+      ></i>
+      <div
+        class="spinner-border"
+        style="width: 3rem; height: 3rem"
+        role="status"
+        *ngIf="steps[0].status == 'IN_PROGRESS'"
+      >
+        <span class="visually-hidden">...</span>
+      </div>
+    </div>
+    <div class="col">
+      <span
+        class="loader-one"
+        [ngStyle]="{ opacity: stepStarted(steps[1]) ? 1 : 0 }"
+      ></span>
+    </div>
+    <div class="col">
+      <i
+        [class]="getStepClass(steps[1])"
+        *ngIf="steps[1].status !== 'IN_PROGRESS'"
+      ></i>
+      <div
+        class="spinner-border"
+        style="width: 3rem; height: 3rem"
+        role="status"
+        *ngIf="steps[1].status == 'IN_PROGRESS'"
+      >
+        <span class="visually-hidden">...</span>
+      </div>
+    </div>
+    <div class="col">
+      <span
+        class="loader-two"
+        [ngStyle]="{ opacity: stepStarted(steps[2]) ? 1 : 0 }"
+      ></span>
+    </div>
+    <div class="col">
+      <i
+        [class]="getStepClass(steps[2])"
+        *ngIf="steps[2].status !== 'IN_PROGRESS'"
+      ></i>
+      <div
+        class="spinner-border"
+        style="width: 3rem; height: 3rem"
+        role="status"
+        *ngIf="steps[2].status == 'IN_PROGRESS'"
+      >
+        <span class="visually-hidden">...</span>
+      </div>
+    </div>
+  </div>
+  <div class="row row-cols-5 g-0 justify-content-center align-items-center">
+    <div class="col">
+      {{ steps[0].status }}
+    </div>
+    <div class="col"></div>
+    <div class="col">
+      {{ steps[1].status }}
+    </div>
+    <div class="col"></div>
+    <div class="col">
+      {{ steps[2].status }}
+    </div>
+  </div>
+  <div
+    class="row row-cols-5 g-0 justify-content-center align-items-center"
+    style="min-height: 100px"
+  >
+    <div class="col">
+      {{ steps[0].notes[0] }}
+    </div>
+    <div class="col"></div>
+    <div class="col">
+      {{ steps[1].notes[0] }}
+      <br />
+      {{ steps[1].notes[1] }}
+    </div>
+    <div class="col"></div>
+    <div class="col">
+      {{ steps[2].notes[0] }}
+    </div>
+  </div>
+  <div class="d-flex align-items-end flex-column">
+    <div class="mt-auto">
+      <button type="button" class="btn btn-outline-danger">Cancel</button>
+    </div>
+  </div>
+</div>

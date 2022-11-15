@@ -17,4 +17,9 @@ export class PredictionService {
 
     return this.httpClient.post(`${this.path}/model`, data);
   }
+
+  checkServiceAvailability(model: string): Observable<any> {
+    let data = { model: model, sequence: 'ping'};
+    return this.httpClient.post(`${this.path}/model`, data);
+  }
 }

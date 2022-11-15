@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, concatMap, from, map, throwError } from 'rxjs';
+import { catchError, concatMap, from, map, throwError, timeout } from 'rxjs';
 import { Sequence } from '../../models/sequence';
 import { PredictionService } from '../../services/prediction.service';
 import { PredictionResponse } from '../../models/predictionResponse';
@@ -10,6 +10,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { ModelData } from '../../models/modelData';
 import { serverTimestamp } from '@angular/fire/firestore';
+import { ProcessStep } from '../../models/processStep';
 
 @Component({
   selector: 'app-amyloid-workspace-details',
@@ -19,7 +20,25 @@ import { serverTimestamp } from '@angular/fire/firestore';
 export class AmyloidWorkspaceDetailsComponent implements OnInit {
   workspace!: Workspace;
   sequences: Sequence[] | undefined;
+  processSteps: ProcessStep[] = [
+    {
+      name: 'CONNECTION_CHECK',
+      status: 'NOT_STARTED',
+      notes: [],
+    },
+    {
+      name: 'PREDICTION',
+      status: 'NOT_STARTED',
+      notes: [],
+    },
+    {
+      name: 'SAVING',
+      status: 'NOT_STARTED',
+      notes: [],
+    },
+  ];
   predictionInProgress: boolean = false;
+  fullPredictionInProgress: boolean = false;
   idBeingPredicted: string | undefined;
   predictionProgress: number = 0;
   currentSequence: Sequence | undefined;
@@ -109,7 +128,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     this.modalService
       .open(content, { ariaLabelledBy: 'modal-basic-title', size: 'xl' })
       .result.then(
-        (result) => {},
+        () => {},
         () => {}
       );
   }
@@ -118,7 +137,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     this.offcanvasService
       .open(content, { ariaLabelledBy: 'offcanvas-basic-title' })
       .result.then(
-        (result) => {},
+        () => {},
         () => {}
       );
   }
@@ -134,83 +153,108 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
 
   predictAll(model: string): void {
     this.predictionInProgress = true;
+    this.fullPredictionInProgress = true;
     let currentIndex = 0;
     let lastIndex = this.sequences!.length - 1;
 
-    const _sequences = from(this.sequences!);
+    this.processSteps[0].status = 'IN_PROGRESS';
+    this.predictionService.checkServiceAvailability(model).subscribe(() => {
+      this.processSteps[0].status = 'SUCCESSFUL';
+      this.processSteps[1].status = 'IN_PROGRESS';
 
-    this.idBeingPredicted = this.sequences![currentIndex].id;
+      const _sequences = from(this.sequences!);
 
-    _sequences
-      .pipe(
-        concatMap((sequence) =>
-          this.predictionService.predictFull(
-            this.currentSelectedModelForPredictions,
-            sequence.value
-          )
-        ),
-        catchError((error) => {
-          console.error(error);
-          return error;
-        })
-      )
-      .subscribe((response: PredictionResponse) => {
-        let seq = this.sequences!.find(
-          (s) => s.id == this.sequences![currentIndex].id
-        )!;
-        let newState =
-          response.classification == 'Positive' ? 'POSITIVE' : 'NEGATIVE';
-        seq.state = newState;
-        seq.predictLogs.push({
-          model: model,
-          log: response.result.toString().replace(/'/g, '"'),
+      this.idBeingPredicted = this.sequences![currentIndex].id;
+      this.processSteps[1].notes[0] = `Predicting ${
+        this.sequences![currentIndex].name
+      }`;
+      this.processSteps[1].notes[1] =
+        this.predictionProgress.toString() + '% done';
+
+      _sequences
+        .pipe(
+          concatMap((sequence) =>
+            this.predictionService.predictFull(
+              this.currentSelectedModelForPredictions,
+              sequence.value
+            )
+          ),
+          catchError((error) => {
+            console.error(error);
+            return error;
+          })
+        )
+        .subscribe((response: PredictionResponse) => {
+          let seq = this.sequences!.find(
+            (s) => s.id == this.sequences![currentIndex].id
+          )!;
+          let newState =
+            response.classification == 'Positive' ? 'POSITIVE' : 'NEGATIVE';
+          seq.state = newState;
+          seq.predictLogs.push({
+            model: model,
+            log: response.result.toString().replace(/'/g, '"'),
+          });
+          this.workspace.sequences = this.sequences!;
+
+          if (currentIndex == lastIndex) {
+            this.processSteps[1].status = 'SUCCESSFUL';
+            this.processSteps[2].status = 'IN_PROGRESS';
+            this.workspace.updated = serverTimestamp();
+            this.workspaceService.update(this.workspace);
+            this.processSteps[2].status = 'SUCCESSFUL';
+            this.resetPredictionProgress();
+          } else {
+            currentIndex++;
+            this.idBeingPredicted = this.sequences![currentIndex].id;
+            this.processSteps[1].notes[0] = `Predicting ${
+              this.sequences![currentIndex].name
+            }`;
+            this.predictionProgress = Math.round(
+              (currentIndex / lastIndex) * 100
+            );
+            this.processSteps[1].notes[1] =
+              this.predictionProgress.toString() + '% done';
+          }
         });
-        this.workspace.sequences = this.sequences!;
-
-        if (currentIndex == lastIndex) {
-          this.workspace.updated = serverTimestamp();
-          this.workspaceService.update(this.workspace);
-          this.resetPredictionProgress();
-        } else {
-          currentIndex++;
-          this.idBeingPredicted = this.sequences![currentIndex].id;
-          this.predictionProgress = Math.round(
-            (currentIndex / lastIndex) * 100
-          );
-        }
-      });
+    });
   }
 
   predict(sequence: string, id: string, model: string): void {
     this.predictionInProgress = true;
     this.idBeingPredicted = id;
     let seq = this.sequences!.find((s) => s.id == id)!;
+    this.predictionService.checkServiceAvailability(model).subscribe(() => {
+      this.predictionService
+        .predictFull(model, sequence)
+        .pipe(
+          timeout({
+            each: 60_000,
+            with: () => throwError(() => new Error('Timeout')),
+          }),
+          catchError(() => {
+            this.resetPredictionProgress();
+            return throwError(
+              () => new Error('Error during prediction for model: ' + model)
+            );
+          })
+        )
+        .subscribe((response: PredictionResponse) => {
+          let newState =
+            response.classification == 'Positive' ? 'POSITIVE' : 'NEGATIVE';
+          seq.state = newState;
 
-    this.predictionService
-      .predictFull(model, sequence)
-      .pipe(
-        catchError(() => {
+          seq.predictLogs.push({
+            model: model,
+            log: response.result.toString().replace(/'/g, '"'),
+          });
+          this.workspace.sequences = this.sequences!;
+          this.workspace.updated = serverTimestamp();
+          this.workspaceService.update(this.workspace);
+
           this.resetPredictionProgress();
-          return throwError(
-            () => new Error('Error during prediction for model: ' + model)
-          );
-        })
-      )
-      .subscribe((response: PredictionResponse) => {
-        let newState =
-          response.classification == 'Positive' ? 'POSITIVE' : 'NEGATIVE';
-        seq.state = newState;
-
-        seq.predictLogs.push({
-          model: model,
-          log: response.result.toString().replace(/'/g, '"'),
         });
-        this.workspace.sequences = this.sequences!;
-        this.workspace.updated = serverTimestamp();
-        this.workspaceService.update(this.workspace);
-
-        this.resetPredictionProgress();
-      });
+    });
   }
 
   private resetPredictionProgress(): void {

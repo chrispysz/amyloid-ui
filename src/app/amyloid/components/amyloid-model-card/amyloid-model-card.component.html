@@ -1,6 +1,6 @@
 <div class="container">
       <div class="mb-4" *ngFor="let card of modelCards">
-        <div class="card" (click)="handleModelClick(card)">
+        <div class="card" (click)="handleModelClick(card)" [ngStyle]="{ opacity: isSelected(card) ? 1 : 0.5 }">
             <img [src]="card.imageUrl" class="card-img-top" alt="Model image">
             <div class="card-body">
               <h5 class="card-title">{{card.name}}</h5>

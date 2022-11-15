@@ -19,10 +19,11 @@ export class AuthService {
   ) {}
 
   logIn(email: string, password: string) {
+    console.log(email, password);
     return signInWithEmailAndPassword(this.auth, email, password)
       .then(() => {
         this.toastr.info('Logged in successfully');
-        localStorage.setItem('user', JSON.stringify(this.auth.currentUser));
+        sessionStorage.setItem('user', JSON.stringify(this.auth.currentUser));
       })
       .catch(() => {
         this.toastr.error('Login failed');
@@ -37,7 +38,7 @@ export class AuthService {
     return signOut(this.auth)
       .then(() => {
         this.toastr.info('Logged out successfully');
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
         this.router.navigate(['/amyloid/dashboard']);
       })
       .catch(() => {
@@ -46,6 +47,6 @@ export class AuthService {
   }
 
   loggedIn(): boolean {
-    return JSON.parse(localStorage.getItem('user')!) ? true : false;
+    return JSON.parse(sessionStorage.getItem('user')!) ? true : false;
   }
 }

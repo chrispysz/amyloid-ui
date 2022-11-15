@@ -14,6 +14,7 @@ import { AmyloidDetailedResultsComponent } from './components/amyloid-detailed-r
 import { AmyloidWorkspaceSettingsComponent } from './components/amyloid-workspace-settings/amyloid-workspace-settings.component';
 import { AmyloidModelCardComponent } from './components/amyloid-model-card/amyloid-model-card.component';
 import { AmyloidNavbarComponent } from './components/amyloid-navbar/amyloid-navbar.component';
+import { AmyloidPredictionProgressComponent } from './components/amyloid-prediction-progress/amyloid-prediction-progress.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { AmyloidNavbarComponent } from './components/amyloid-navbar/amyloid-navb
     AmyloidWorkspaceSettingsComponent,
     AmyloidModelCardComponent,
     AmyloidNavbarComponent,
+    AmyloidPredictionProgressComponent,
   ],
   imports: [
     CommonModule,

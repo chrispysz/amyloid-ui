@@ -44,7 +44,6 @@ export class WorkspaceService {
       sequences: workspace.sequences,
       updated: workspace.updated,
     };
-    console.log(updatedWorkspace);
     updateDoc(docRef, updatedWorkspace)
       .then((docRef) => {
         this.toastr.success(`Workspace ${workspace.name} updated successfully`);
