@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.8.0](https://github.com/chrispysz/amyloid-ui/compare/v0.7.1...v0.8.0) (2022-11-15)
+
+
+### Features
+
+* add multi-model functionality ([7fc4e41](https://github.com/chrispysz/amyloid-ui/commit/7fc4e41159202c98f8b810f9d833edc6cedff45b))
+* add prediction progress dashboard, improve multi-model functionality ([9af5165](https://github.com/chrispysz/amyloid-ui/commit/9af5165c775abaf25663bc021500e56ce54c2e0c))
+
 ### [0.7.1](https://github.com/chrispysz/amyloid-ui/compare/v0.7.0...v0.7.1) (2022-11-12)
 
 
