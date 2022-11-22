@@ -12,6 +12,7 @@ import { ModelData } from '../../models/modelData';
 import { serverTimestamp } from '@angular/fire/firestore';
 import { ProcessStep } from '../../models/processStep';
 import { ModelService } from '../../services/model.service';
+import { PredictedSubsequence } from '../../models/predictedSubsequence';
 
 @Component({
   selector: 'app-amyloid-workspace-details',
@@ -27,8 +28,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   idBeingPredicted: string | undefined;
   predictionProgress: number = 0;
   currentSequence: Sequence | undefined;
-  logFilteredSequence: Sequence | undefined;
-  currentSelectedModelForLogs: string = '';
+  logSequences: PredictedSubsequence[] | undefined;
   currentSelectedModelForPredictions: string = 'AmBERT';
 
   editActionDescription: string = '';
@@ -104,8 +104,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
               id: Date.now().toString(),
               name: result.sequenceIdentifier,
               value: result.sequenceValue,
-              state: 'PENDING',
-              subsequences: [],
+              modelPredictions: [],
               predictLogs: [],
             };
             this.sequences?.push(sequence);
@@ -120,14 +119,26 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
 
   openResultsModal(content: any, sequence: Sequence) {
     this.currentSequence = sequence;
-    this.logFilteredSequence = { ...this.currentSequence };
-    this.filterLogsByModel('AmBERT');
+    this.logSequences = this.parseJson(this.currentSequence);
+
     this.modalService
       .open(content, { ariaLabelledBy: 'modal-basic-title', size: 'xl' })
       .result.then(
         () => {},
         () => {}
       );
+  }
+
+  parseJson(value: Sequence): PredictedSubsequence[] {
+    let subseqs: PredictedSubsequence[] = [];
+    if (value) {
+      value.predictLogs.forEach((predictLog) => {
+        if (predictLog.model == this.currentSelectedModelForPredictions) {
+          subseqs = JSON.parse(predictLog.log);
+        }
+      });
+    }
+    return subseqs;
   }
 
   openPredictionModelsOffCanvas(content: any) {
@@ -205,7 +216,10 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             )!;
             let newState =
               response.classification == 'Positive' ? 'POSITIVE' : 'NEGATIVE';
-            seq.state = newState;
+            seq.modelPredictions.push({
+              model: model,
+              state: newState,
+            });
             seq.predictLogs.push({
               model: model,
               log: response.result.toString().replace(/'/g, '"'),
@@ -263,7 +277,11 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
         .subscribe((response: PredictionResponse) => {
           let newState =
             response.classification == 'Positive' ? 'POSITIVE' : 'NEGATIVE';
-          seq.state = newState;
+
+          seq.modelPredictions.push({
+            model: model,
+            state: newState,
+          });
 
           seq.predictLogs.push({
             model: model,
@@ -287,14 +305,14 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     this.currentSelectedModelForPredictions = model.name;
   }
 
-  onLogModelSelect(selection: string) {
-    this.filterLogsByModel(selection);
-  }
+  getStateForCurrentModel(sequence: Sequence): string {
+    let state = 'PENDING';
+    sequence.modelPredictions.forEach((modelPrediction) => {
+      if (modelPrediction.model == this.currentSelectedModelForPredictions) {
+        state = modelPrediction.state;
+      }
+    });
 
-  filterLogsByModel(model: string) {
-    const selectedLogs = this.currentSequence!.predictLogs.filter(
-      (s) => s.model == model
-    );
-    this.logFilteredSequence!.predictLogs = selectedLogs;
+    return state;
   }
 }

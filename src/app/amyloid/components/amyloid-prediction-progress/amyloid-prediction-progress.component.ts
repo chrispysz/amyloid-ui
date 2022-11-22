@@ -42,14 +42,18 @@ export class AmyloidPredictionProgressComponent implements OnInit {
           default:
             return 'bi bi-save icon';
         }
-    }
-    switch (step.status) {
-      case 'SUCCESSFUL':
-        return 'bi bi-broadcast-pin icon text-success';
-      case 'FAILED':
-        return 'bi bi-broadcast-pin icon text-danger';
+      case 'FINISHING':
+        switch (step.status) {
+          case 'SUCCESSFUL':
+            return 'bi bi-save icon text-success';
+          case 'FAILED':
+            return 'bi bi-save icon text-danger';
+          default:
+            return 'bi bi-save icon';
+        }
+
       default:
-        return 'bi bi-broadcast-pin icon';
+        return '';
     }
   }
 

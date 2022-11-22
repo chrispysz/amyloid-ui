@@ -8,15 +8,14 @@ import { Sequence } from '../../models/sequence';
   styleUrls: ['./amyloid-detailed-results.component.scss'],
 })
 export class AmyloidDetailedResultsComponent implements OnInit {
-  @Input() sequence: Sequence | undefined;
+  @Input() sequences: PredictedSubsequence[] | undefined;
 
   constructor() {}
 
-  ngOnInit(): void {}
-
-  parseJson(value: Sequence): any {
-    return JSON.parse(value.predictLogs[0].log);
+  ngOnInit(): void {
   }
+
+  
 
   parseFloat(value: string): number {
     return parseFloat(value);

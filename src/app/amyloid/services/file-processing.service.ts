@@ -24,8 +24,7 @@ export class FileProcessingService {
           id: Date.now().toString() + '-' + indexCounter.toString(),
           name: recentName.replace('>', ''),
           value: this.cleanLine(line),
-          state: 'PENDING',
-          subsequences: [],
+          modelPredictions: [],
           predictLogs: [],
         };
         sequences.push(sequence);

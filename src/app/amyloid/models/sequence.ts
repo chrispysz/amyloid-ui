@@ -1,10 +1,10 @@
-import { Subsequence } from './subsequence';
+
+import { ModelPrediction } from './modelPrediction';
 import { PredictLog } from './predictLog';
 export interface Sequence {
   id: string;
   name: string;
-  state: string;
   value: string;
-  subsequences: Subsequence[];
+  modelPredictions: ModelPrediction[];
   predictLogs: PredictLog[];
 }

@@ -19,7 +19,6 @@ export class AuthService {
   ) {}
 
   logIn(email: string, password: string) {
-    console.log(email, password);
     return signInWithEmailAndPassword(this.auth, email, password)
       .then(() => {
         this.toastr.info('Logged in successfully');

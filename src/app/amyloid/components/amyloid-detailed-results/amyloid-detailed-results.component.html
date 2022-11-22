@@ -1,5 +1,5 @@
 <div
-  *ngIf="sequence!.predictLogs.length > 0; else noSeqsForModel"
+  *ngIf="sequences && sequences.length > 0; else noSeqsForModel"
   class="table-responsive"
 >
   <table class="table table-hover table-striped">
@@ -13,10 +13,10 @@
     </thead>
     <tbody>
       <tr
-        *ngFor="let seq of parseJson(sequence!); index as i"
+        *ngFor="let seq of sequences; index as i"
       >
         <th scope="row">{{ i + 1 }}</th>
-        <td>{{ seq.sequence }}</td>
+        <td>{{ seq!.sequence }}</td>
         <td>
           <div *ngIf="parseFloat(seq.prediction) > 0.5">
             <em
