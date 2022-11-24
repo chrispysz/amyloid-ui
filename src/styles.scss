@@ -4,10 +4,9 @@ $secondary: #fee36e;
 $text-primary: #6e85b7;
 $text-secondary: #fee36e;
 
-@import "~bootstrap/scss/bootstrap";
-@import "~bootstrap-icons/font/bootstrap-icons.css";
-
-@import "~ngx-toastr/toastr";
+@import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+@import "ngx-toastr/toastr";
 
 html {
   background-color: $primary;
