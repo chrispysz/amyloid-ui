@@ -11,23 +11,28 @@ export class FileProcessingService {
     const sequences: Sequence[] = [];
     let recentName = '';
     let indexCounter = 0;
+    let recentValue = '';
 
     const splitData = fileContent.split('\n');
 
     splitData.forEach((line) => {
-      if (line.startsWith('>') && line.trim().length) {
+      if (line.startsWith('>') || !line.trim().length) {
+        if (recentValue.length) {
+          let sequence: Sequence = {
+            id: Date.now().toString() + '-' + indexCounter.toString(),
+            name: recentName.replace('>', ''),
+            value: recentValue,
+            modelPredictions: [],
+            predictLogs: [],
+          };
+          sequences.push(sequence);
+          recentValue = '';
+        }
         recentName = line.trim();
         indexCounter += 1;
       }
       if (!line.startsWith('>') && line.trim().length) {
-        let sequence: Sequence = {
-          id: Date.now().toString() + '-' + indexCounter.toString(),
-          name: recentName.replace('>', ''),
-          value: this.cleanLine(line),
-          modelPredictions: [],
-          predictLogs: [],
-        };
-        sequences.push(sequence);
+        recentValue += this.cleanLine(line);
       }
     });
 

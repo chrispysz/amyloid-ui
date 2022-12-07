@@ -37,12 +37,12 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     sequenceIdentifier: new FormControl('', [
       Validators.required,
       Validators.minLength(2),
-      Validators.maxLength(30),
+      Validators.maxLength(100),
     ]),
     sequenceValue: new FormControl('', [
       Validators.required,
       Validators.minLength(40),
-      Validators.maxLength(500),
+      Validators.maxLength(1024),
     ]),
   });
 

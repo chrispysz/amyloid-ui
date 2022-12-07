@@ -15,8 +15,8 @@ export class WorkspaceResolver implements Resolve<Workspace> {
   ) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<Workspace> {
-    const workspaceId = +route.paramMap.get('id')!;
-    return this.workspaceService.get(workspaceId.toString()).pipe(
+    const workspaceId = route.paramMap.get('id')!;
+    return this.workspaceService.get(workspaceId).pipe(
       catchError(() => {
         this.ngZone.run(() => {
           this.router.navigate(['/amyloid/dashboard']);
