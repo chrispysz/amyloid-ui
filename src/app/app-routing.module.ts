@@ -7,6 +7,7 @@ import { AmyloidWorkspaceDetailsComponent } from './amyloid/components/amyloid-w
 import { WorkspaceResolver } from './amyloid/resolvers/workspace.resolver';
 import { AmyloidWorkspaceSettingsComponent } from './amyloid/components/amyloid-workspace-settings/amyloid-workspace-settings.component';
 import { AuthGuard } from './amyloid/guards/auth.guard';
+import { AmyloidWorkspaceResultsComponent } from './amyloid/components/amyloid-workspace-results/amyloid-workspace-results.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/amyloid/dashboard', pathMatch: 'full' },
@@ -35,9 +36,18 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'amyloid/settings/:id',
+    path: 'amyloid/:id/settings',
     component: AmyloidWorkspaceSettingsComponent,
     title: 'Workspace settings - AmyloTool',
+    resolve: {
+      workspace: WorkspaceResolver,
+    },
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'amyloid/:id/results',
+    component: AmyloidWorkspaceResultsComponent,
+    title: 'Workspace results - AmyloTool',
     resolve: {
       workspace: WorkspaceResolver,
     },
