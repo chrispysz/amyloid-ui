@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.9.0](https://github.com/chrispysz/amyloid-ui/compare/v0.8.2...v0.9.0) (2022-12-08)
+
+
+### Features
+
+* set up general results tab ([58aa979](https://github.com/chrispysz/amyloid-ui/commit/58aa979664990e3e4a7557eefaee32b068f1f4a4))
+
+
+### Bug Fixes
+
+* fix fasta files loading, change table formatting ([6256cbf](https://github.com/chrispysz/amyloid-ui/commit/6256cbf2ee5ffce4c5ec7261b79c8f0972f120bd))
+* reduce data fetching frequency ([030416e](https://github.com/chrispysz/amyloid-ui/commit/030416efd6c7f948b611a6a62b309ffc7cce263e))
+* update packages ([8703bbb](https://github.com/chrispysz/amyloid-ui/commit/8703bbb7e0cdae581ae8434734773dd444f1a518))
+
 ### [0.8.2](https://github.com/chrispysz/amyloid-ui/compare/v0.8.1...v0.8.2) (2022-11-22)
 
 
