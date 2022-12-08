@@ -8,7 +8,6 @@ import { FileProcessingService } from '../../services/file-processing.service';
 import { Sequence } from '../../models/sequence';
 import { serverTimestamp } from '@angular/fire/firestore';
 import { AuthService } from '../../services/auth.service';
-import { Observable } from 'rxjs/internal/Observable';
 
 @Component({
   selector: 'app-amyloid-workspace',
@@ -23,7 +22,7 @@ export class AmyloidWorkspaceComponent implements OnInit {
     private readonly authService: AuthService
   ) {}
 
-  workspaces$: Observable<Workspace[]> | undefined;
+  workspaces: Workspace[] | undefined;
 
   private readonly reader = new FileReader();
 
@@ -49,7 +48,9 @@ export class AmyloidWorkspaceComponent implements OnInit {
   addedSequences: Sequence[] = [];
 
   ngOnInit(): void {
-    this.workspaces$ = this.workspaceService.getAll();
+    this.workspaceService.getAll().then((workspaces) => {
+      this.workspaces = workspaces;
+    });
   }
 
   loggedIn() {

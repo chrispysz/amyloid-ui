@@ -1,6 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Router, Resolve, ActivatedRouteSnapshot } from '@angular/router';
-import { catchError, lastValueFrom, Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { Workspace } from '../models/workspace';
 import { WorkspaceService } from '../services/workspace.service';
 
@@ -14,18 +14,13 @@ export class WorkspaceResolver implements Resolve<Workspace> {
     private ngZone: NgZone
   ) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<Workspace> {
+  resolve(route: ActivatedRouteSnapshot): Promise<any> {
     const workspaceId = route.paramMap.get('id')!;
-    return this.workspaceService.get(workspaceId).pipe(
-      catchError(() => {
-        this.ngZone.run(() => {
-          this.router.navigate(['/amyloid/dashboard']);
-        });
-
-        return throwError(
-          () => new Error('Workspace with ID ${id} could not be found!')
-        );
-      })
-    );
+    return this.workspaceService.get(workspaceId).catch((err) => {
+      this.ngZone.run(() => {
+        this.router.navigate(['/amyloid/dashboard']);
+      });
+      throwError(() => new Error(err));
+    });
   }
 }

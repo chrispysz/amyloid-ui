@@ -141,7 +141,7 @@
   </button>
   <button
     class="btn btn-secondary"
-    style="font-weight: bold; border-radius: 0px"
+    style="font-weight: bold; border-radius: 0px; margin-right: 1px; min-width: 150px;"
     name="Predict all"
     [disabled]="predictionInProgress"
     (click)="predictAll(currentSelectedModelForPredictions)"
@@ -153,15 +153,27 @@
   </button>
   <button
     class="btn btn-secondary"
+    style="font-weight: bold; border-radius: 0px; min-width: 150px; margin-right: 1px;"
+    name="Results"
+    [disabled]="predictionInProgress"
+    [routerLink]="['./results']"
+  >
+    <span class="btn-label" style="font-weight: bold"
+      ><em class="bi bi-file-bar-graph"></em
+    ></span>
+    Results
+  </button>
+  <button
+    class="btn btn-secondary"
     style="
       font-weight: bold;
       border-radius: 0px;
       border-top-right-radius: 15px;
-      margin-left: 1px;
+      min-width: 150px;
     "
-    name="Predict all"
+    name="Open settings"
     [disabled]="predictionInProgress"
-    [routerLink]="['/amyloid/settings', workspace.id]"
+    [routerLink]="['./settings']"
   >
     <span class="btn-label" style="font-weight: bold"
       ><em class="bi bi-gear"></em

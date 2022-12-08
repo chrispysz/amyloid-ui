@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, concatMap, from, map, throwError, timeout } from 'rxjs';
 import { Sequence } from '../../models/sequence';
@@ -18,6 +18,7 @@ import { PredictedSubsequence } from '../../models/predictedSubsequence';
   selector: 'app-amyloid-workspace-details',
   templateUrl: './amyloid-workspace-details.component.html',
   styleUrls: ['./amyloid-workspace-details.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AmyloidWorkspaceDetailsComponent implements OnInit {
   workspace!: Workspace;
@@ -119,7 +120,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
 
   openResultsModal(content: any, sequence: Sequence) {
     this.currentSequence = sequence;
-    this.logSequences = this.parseJson(this.currentSequence);
+    this.logSequences = this.getPredictionsArrayFromLogs(this.currentSequence);
 
     this.modalService
       .open(content, { ariaLabelledBy: 'modal-basic-title', size: 'xl' })
@@ -129,7 +130,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       );
   }
 
-  parseJson(value: Sequence): PredictedSubsequence[] {
+  getPredictionsArrayFromLogs(value: Sequence): PredictedSubsequence[] {
     let subseqs: PredictedSubsequence[] = [];
     if (value) {
       value.predictLogs.forEach((predictLog) => {

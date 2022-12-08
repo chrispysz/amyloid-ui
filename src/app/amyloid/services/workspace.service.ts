@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {
-  Observable,
-  map,
-} from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Workspace } from '../models/workspace';
 import {
   Firestore,
@@ -12,6 +9,8 @@ import {
   updateDoc,
   deleteDoc,
   setDoc,
+  getDoc,
+  getDocs,
 } from '@angular/fire/firestore';
 import { ToastrService } from 'ngx-toastr';
 import { collectionData, docData } from 'rxfire/firestore';
@@ -64,20 +63,41 @@ export class WorkspaceService {
       });
   }
 
-  get(id: string): Observable<Workspace> {
+  async get(id: string): Promise<Workspace> {
     let docRef = doc(this.firestore, 'workspaces/' + id);
-    return docData(docRef, { idField: 'id' }).pipe(
-      map((w) => ({
-        id: w['id'],
-        name: w['name'],
-        sequences: w['sequences'],
-        created: w['created'],
-        updated: w['updated'],
-      }))
-    );
+    return new Promise((resolve, reject) => {
+      getDoc(docRef)
+        .then((doc) => {
+          if (doc.exists()) {
+            let workspace = doc.data() as Workspace;
+            workspace.id = doc.id;
+            resolve(workspace);
+          } else {
+            reject('No such document!');
+          }
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
   }
 
-  getAll() {
-    return collectionData(this.workspacesCollection, {idField: 'id'}) as Observable<Workspace[]>;
+  async getAll(): Promise<Workspace[]> {
+    return new Promise((resolve, reject) => {
+      let workspaces: Workspace[] = [];
+      getDocs(this.workspacesCollection)
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            let workspace = doc.data() as Workspace;
+            workspace.id = doc.id;
+            workspaces.push(workspace);
+          });
+
+          resolve(workspaces);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
   }
 }

@@ -82,7 +82,7 @@
     "
     name="Add workspace"
     (click)="open(content)"
-    [disabled]="!(workspaces$ | async)"
+    [disabled]="!(workspaces)"
   >
     <span class="btn-label" style="font-weight: bold"
       ><em class="bi bi-folder-plus"></em
@@ -103,10 +103,10 @@
       </thead>
       <tbody>
         <ng-container
-          *ngIf="workspaces$ | async as workspaces; else noWorkspaces"
+          *ngIf="workspaces as workspaces; else noWorkspaces"
         >
           <tr
-            *ngFor="let workspace of workspaces$ | async; index as i"
+            *ngFor="let workspace of workspaces; index as i"
             [routerLink]="['/amyloid', workspace.id]"
           >
             <th scope="row">{{ i + 1 }}</th>
