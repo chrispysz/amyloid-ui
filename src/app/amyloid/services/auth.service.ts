@@ -48,4 +48,8 @@ export class AuthService {
   loggedIn(): boolean {
     return JSON.parse(sessionStorage.getItem('user')!) ? true : false;
   }
+
+  getUserId(): string {
+    return this.auth.currentUser!.uid
+  }
 }

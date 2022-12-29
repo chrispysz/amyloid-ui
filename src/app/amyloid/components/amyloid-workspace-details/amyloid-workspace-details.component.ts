@@ -1,11 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, concatMap, from, map, throwError, timeout } from 'rxjs';
 import { Sequence } from '../../models/sequence';
 import { PredictionService } from '../../services/prediction.service';
 import { PredictionResponse } from '../../models/predictionResponse';
 import { Workspace } from '../../models/workspace';
-import { WorkspaceService } from '../../services/workspace.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { ModelData } from '../../models/modelData';
@@ -13,16 +12,24 @@ import { serverTimestamp } from '@angular/fire/firestore';
 import { ProcessStep } from '../../models/processStep';
 import { ModelService } from '../../services/model.service';
 import { PredictedSubsequence } from '../../models/predictedSubsequence';
+import { FirestoreService } from '../../services/firestore.service';
+import { FileStorageService } from '../../services/file-storage.service';
 
 @Component({
   selector: 'app-amyloid-workspace-details',
   templateUrl: './amyloid-workspace-details.component.html',
   styleUrls: ['./amyloid-workspace-details.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AmyloidWorkspaceDetailsComponent implements OnInit {
-  workspace!: Workspace;
-  sequences: Sequence[] | undefined;
+  page = 1;
+  pageSize = 50;
+  collectionSize!: number;
+  pagedSequences: Sequence[] = [];
+
+  workspace: Workspace | undefined;
+  workspaceId: string = '';
+  isLoading: boolean = true;
+  sequences: Sequence[] = [];
   processSteps!: ProcessStep[];
   predictionInProgress: boolean = false;
   fullPredictionInProgress: boolean = false;
@@ -50,30 +57,47 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly predictionService: PredictionService,
-    private readonly workspaceService: WorkspaceService,
+    private readonly firestoreService: FirestoreService,
+    private readonly fileStorageService: FileStorageService,
     private readonly modelService: ModelService,
     private readonly modalService: NgbModal,
     private readonly offcanvasService: NgbOffcanvas
   ) {}
 
   ngOnInit(): void {
-    this.route.data
-      .pipe(map((data) => data['workspace']))
-      .subscribe((result) => {
-        this.workspace = result;
-        this.sequences = result.sequences;
-        this.processSteps = this.predictionService.getDefaultPredictionSteps();
-        if (sessionStorage.getItem('selectedModel')) {
-          let foundSelectedModel = this.modelService
-            .getModels()
-            .find(
-              (m: ModelData) => m.id == sessionStorage.getItem('selectedModel')
-            );
-          if (foundSelectedModel) {
-            this.currentSelectedModelForPredictions = foundSelectedModel.name;
+    this.route.queryParams.subscribe((params) => {
+      let workspaceId = params['id'];
+      this.workspaceId = workspaceId;
+      let user = JSON.parse(sessionStorage.getItem('user')!);
+      if (user && user['uid']) {
+        let loadPath = user['uid'] + '/' + workspaceId;
+        this.fileStorageService.loadWorkspace(loadPath).then((workspace) => {
+          this.workspace = workspace;
+          this.workspaceId = workspace.id;
+          this.sequences = workspace.sequences;
+          this.getPagedSequences();
+          this.collectionSize = this.sequences!.length;
+          this.processSteps =
+            this.predictionService.getDefaultPredictionSteps();
+          if (sessionStorage.getItem('selectedModel')) {
+            let foundSelectedModel = this.modelService
+              .getModels()
+              .find(
+                (m: ModelData) =>
+                  m.id == sessionStorage.getItem('selectedModel')
+              );
+            if (foundSelectedModel) {
+              this.currentSelectedModelForPredictions = foundSelectedModel.name;
+            }
           }
-        }
-      });
+        });
+      }
+    });
+  }
+
+  getPagedSequences() {
+    // this.pagedSequences = this.workspaceService.getSequencesByPage(
+    //   this.page, this.pageSize, this.sequences!)
   }
 
   openEditModal(
@@ -92,27 +116,29 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       .open(content, { ariaLabelledBy: 'modal-basic-title' })
       .result.then(
         (result) => {
-          if (actionType == 'Edit') {
-            this.sequences!.find((s) => s.id == seqId)!.name =
-              result.sequenceIdentifier;
-            this.sequences!.find((s) => s.id == seqId)!.value =
-              result.sequenceValue;
-            this.workspace.sequences = this.sequences!;
-            this.workspace.updated = serverTimestamp();
-            this.workspaceService.update(this.workspace);
-          } else if (actionType == 'Add') {
-            let sequence: Sequence = {
-              id: Date.now().toString(),
-              name: result.sequenceIdentifier,
-              value: result.sequenceValue,
-              modelPredictions: [],
-              predictLogs: [],
-            };
-            this.sequences?.push(sequence);
-            this.workspace.sequences = this.sequences!;
-            this.workspace.updated = serverTimestamp();
-            this.workspaceService.update(this.workspace);
-          }
+          // if (actionType == 'Edit') {
+          //   let seq = this.sequences!.find((s) => s.id == seqId)!;
+          //   seq.name =
+          //     result.sequenceIdentifier;
+          //   seq.value =
+          //     result.sequenceValue;
+          //   this.workspace.updated = serverTimestamp();
+          //   this.workspaceService.updateSequence(seq);
+          //   this.workspaceService.updateWorkspace(this.workspace);
+          // } else if (actionType == 'Add') {
+          //   let sequence: Sequence = {
+          //     id: Date.now().toString(),
+          //     workspaceId: this.workspace.id,
+          //     name: result.sequenceIdentifier,
+          //     value: result.sequenceValue,
+          //     modelPredictions: [],
+          //     predictLogs: [],
+          //   };
+          //   this.sequences?.push(sequence);
+          //   this.workspace.updated = serverTimestamp();
+          //   this.workspaceService.addSequences([sequence]);
+          //   this.workspaceService.updateWorkspace(this.workspace);
+          // }
         },
         () => {}
       );
@@ -151,12 +177,11 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       );
   }
 
-  deleteSequence(sequenceId: string, sequenceName: string): void {
-    if (confirm(`Are you sure you want to delete ${sequenceName}?`)) {
-      this.sequences = this.sequences?.filter((s) => s.id != sequenceId);
-      this.workspace.sequences = this.sequences!;
-      this.workspace.updated = serverTimestamp();
-      this.workspaceService.update(this.workspace);
+  deleteSequence(sequence: Sequence): void {
+    if (confirm(`Are you sure you want to delete ${sequence.name}?`)) {
+      // this.workspaceService.deleteSequence(sequence);
+      // this.workspace.updated = serverTimestamp();
+      // this.workspaceService.updateWorkspace(this.workspace);
     }
   }
 
@@ -225,14 +250,14 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
               model: model,
               log: response.result.toString().replace(/'/g, '"'),
             });
-            this.workspace.sequences = this.sequences!;
 
             if (currentIndex == lastIndex) {
               this.processSteps[1].status = 'SUCCESSFUL';
               this.processSteps[2].status = 'IN_PROGRESS';
               this.sleep(1800).then(() => {
-                this.workspace.updated = serverTimestamp();
-                this.workspaceService.update(this.workspace);
+                // this.workspaceService.updateSequence(seq);
+                // this.workspace.updated = serverTimestamp();
+                // this.workspaceService.updateWorkspace(this.workspace);
                 this.processSteps[2].status = 'SUCCESSFUL';
                 this.resetPredictionProgress();
               });
@@ -288,9 +313,9 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             model: model,
             log: response.result.toString().replace(/'/g, '"'),
           });
-          this.workspace.sequences = this.sequences!;
-          this.workspace.updated = serverTimestamp();
-          this.workspaceService.update(this.workspace);
+          // this.workspaceService.updateSequence(seq);
+          // this.workspace.updated = serverTimestamp();
+          // this.workspaceService.updateWorkspace(this.workspace);
 
           this.resetPredictionProgress();
         });

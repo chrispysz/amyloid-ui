@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Workspace } from '../../models/workspace';
-import { WorkspaceService } from '../../services/workspace.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { FileProcessingService } from '../../services/file-processing.service';
 import { Sequence } from '../../models/sequence';
-import { serverTimestamp } from '@angular/fire/firestore';
 import { AuthService } from '../../services/auth.service';
+import { FileStorageService } from '../../services/file-storage.service';
+import { FirestoreService } from '../../services/firestore.service';
+import { WorkspaceDbReference } from '../../models/workspace-db-reference';
+import { serverTimestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-amyloid-workspace',
@@ -18,11 +20,12 @@ export class AmyloidWorkspaceComponent implements OnInit {
   constructor(
     private readonly fileProcessingService: FileProcessingService,
     private readonly modalService: NgbModal,
-    private readonly workspaceService: WorkspaceService,
+    private readonly fileStorageService: FileStorageService,
+    private readonly firestoreService: FirestoreService,
     private readonly authService: AuthService
   ) {}
 
-  workspaces: Workspace[] | undefined;
+  workspaces: WorkspaceDbReference[] | undefined;
 
   private readonly reader = new FileReader();
 
@@ -48,9 +51,16 @@ export class AmyloidWorkspaceComponent implements OnInit {
   addedSequences: Sequence[] = [];
 
   ngOnInit(): void {
-    this.workspaceService.getAll().then((workspaces) => {
-      this.workspaces = workspaces;
-    });
+    if(this.loggedIn()) {
+      let user = JSON.parse(sessionStorage.getItem('user')!);
+      if (user && user['uid']){
+        this.firestoreService
+        .getUserWorkspaces(user['uid'])
+        .then((workspaces) => {
+          this.workspaces = workspaces;
+        });
+      }
+    }
   }
 
   loggedIn() {
@@ -58,7 +68,13 @@ export class AmyloidWorkspaceComponent implements OnInit {
   }
 
   logIn(values: any) {
-    this.authService.logIn(values.emailInput, values.passwordInput);
+    this.authService.logIn(values.emailInput, values.passwordInput).then(() => {
+      this.firestoreService
+        .getUserWorkspaces(this.authService.getUserId())
+        .then((workspaces) => {
+          this.workspaces = workspaces;
+        });
+    });
   }
 
   private resetModalData(): void {
@@ -75,24 +91,42 @@ export class AmyloidWorkspaceComponent implements OnInit {
       .open(content, { ariaLabelledBy: 'modal-basic-title' })
       .result.then(
         (result) => {
+          let wsId = Date.now().toString();
+          let savePath = this.authService.getUserId() + '/' + wsId;
+
           if (result.importedFile) {
-            this.workspaceService.add({
-              id: Date.now().toString(),
+            let workspace: Workspace = {
+              id: wsId,
               name: this.fileProcessingService.cleanFileName(
                 result.importedFile.toString()
               ),
               sequences: this.addedSequences,
-              created: serverTimestamp(),
-              updated: serverTimestamp(),
-            });
+            };
+
+            let workspaceDbReference: WorkspaceDbReference = {
+              id: wsId,
+              userId: this.authService.getUserId(),
+              name: this.fileProcessingService.cleanFileName(
+                result.importedFile.toString()
+              ),
+              lastModified: serverTimestamp(),
+            };
+
+            this.createNewWorkspace(workspace, savePath, workspaceDbReference);
           } else {
-            this.workspaceService.add({
-              id: Date.now().toString(),
+            let workspace: Workspace = {
+              id: wsId,
               name: result.name,
-              sequences: this.addedSequences,
-              created: serverTimestamp(),
-              updated: serverTimestamp(),
-            });
+              sequences: [],
+            };
+
+            let workspaceDbReference: WorkspaceDbReference = {
+              id: wsId,
+              userId: this.authService.getUserId(),
+              name: result.name,
+              lastModified: serverTimestamp(),
+            };
+            this.createNewWorkspace(workspace, savePath, workspaceDbReference);
           }
           this.resetModalData();
         },
@@ -100,6 +134,21 @@ export class AmyloidWorkspaceComponent implements OnInit {
           this.resetModalData();
         }
       );
+  }
+
+  createNewWorkspace(
+    workspace: Workspace,
+    savePath: string,
+    workspaceDbReference: WorkspaceDbReference
+  ): void {
+    this.fileStorageService.uploadWorkspace(
+      new Blob([JSON.stringify(workspace)], {
+        type: 'application/json',
+      }),
+      savePath
+    );
+    this.firestoreService.add(workspaceDbReference);
+    this.workspaces?.push(workspaceDbReference);
   }
 
   onFileChange(event: any) {

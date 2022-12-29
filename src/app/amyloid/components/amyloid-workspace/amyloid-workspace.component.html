@@ -82,7 +82,6 @@
     "
     name="Add workspace"
     (click)="open(content)"
-    [disabled]="!(workspaces)"
   >
     <span class="btn-label" style="font-weight: bold"
       ><em class="bi bi-folder-plus"></em
@@ -96,24 +95,20 @@
         <tr>
           <th style="width: 10%"></th>
           <th style="width: 35%">Name</th>
-          <th style="width: 15%">Sequences</th>
-          <th style="width: 20%">Created</th>
-          <th style="width: 20%">Updated</th>
+          <th style="width: 20%">Modified</th>
         </tr>
       </thead>
       <tbody>
         <ng-container
-          *ngIf="workspaces as workspaces; else noWorkspaces"
+          *ngIf="workspaces; else noWorkspaces"
         >
           <tr
             *ngFor="let workspace of workspaces; index as i"
-            [routerLink]="['/amyloid', workspace.id]"
+            [routerLink]="['/amyloid/details']" [queryParams]="{id: workspace.id}" queryParamsHandling="merge"
           >
             <th scope="row">{{ i + 1 }}</th>
             <td>{{ workspace.name }}</td>
-            <td>{{ workspace.sequences.length }}</td>
-            <td>{{ getDateFromTimestamp(workspace.created) }}</td>
-            <td>{{ getDateFromTimestamp(workspace.updated) }}</td>
+            <td>{{ getDateFromTimestamp(workspace.lastModified) }}</td>
           </tr>
         </ng-container>
       </tbody>

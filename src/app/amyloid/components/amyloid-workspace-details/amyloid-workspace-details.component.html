@@ -97,7 +97,7 @@
     </app-amyloid-model-card>
   </div>
 </ng-template>
-<div class="container">
+<div class="container" style="margin-bottom: 100px">
   <app-amyloid-prediction-progress
     *ngIf="fullPredictionInProgress"
     [steps]="processSteps"
@@ -141,7 +141,12 @@
   </button>
   <button
     class="btn btn-secondary"
-    style="font-weight: bold; border-radius: 0px; margin-right: 1px; min-width: 150px;"
+    style="
+      font-weight: bold;
+      border-radius: 0px;
+      margin-right: 1px;
+      min-width: 150px;
+    "
     name="Predict all"
     [disabled]="predictionInProgress"
     (click)="predictAll(currentSelectedModelForPredictions)"
@@ -153,7 +158,12 @@
   </button>
   <button
     class="btn btn-secondary"
-    style="font-weight: bold; border-radius: 0px; min-width: 150px; margin-right: 1px;"
+    style="
+      font-weight: bold;
+      border-radius: 0px;
+      min-width: 150px;
+      margin-right: 1px;
+    "
     name="Results"
     [disabled]="predictionInProgress"
     [routerLink]="['./results']"
@@ -173,7 +183,9 @@
     "
     name="Open settings"
     [disabled]="predictionInProgress"
-    [routerLink]="['./settings']"
+    [routerLink]="['/amyloid/settings']"
+    [queryParams]="{ id: workspaceId }"
+    queryParamsHandling="merge"
   >
     <span class="btn-label" style="font-weight: bold"
       ><em class="bi bi-gear"></em
@@ -185,7 +197,6 @@
     <table class="table table-hover table-striped">
       <thead>
         <tr>
-          <th style="width: 5%"></th>
           <th style="width: 35%">Identifier</th>
           <th style="width: 15%">Actions</th>
           <th style="width: 5%">Status</th>
@@ -193,9 +204,13 @@
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngIf="true">
-          <tr *ngFor="let sequence of sequences; index as i">
-            <th scope="row">{{ i + 1 }}</th>
+        <ng-container *ngIf="sequences && sequences.length > 0">
+          <tr
+            *ngFor="
+              let sequence of sequences
+                | slice : (page - 1) * pageSize : page * pageSize
+            "
+          >
             <td>{{ sequence.name }}</td>
             <td>
               <button
@@ -260,7 +275,7 @@
                 class="btn btn-empty"
                 name="Delete"
                 title="Delete"
-                (click)="deleteSequence(sequence.id, sequence.name)"
+                (click)="deleteSequence(sequence)"
                 [disabled]="predictionInProgress"
                 style="outline: none; border: none; padding: 5px"
               >
@@ -324,4 +339,18 @@
       </tbody>
     </table>
   </div>
+  <ngb-pagination
+    *ngIf="sequences && sequences.length > 0"
+    [(page)]="page"
+    [pageSize]="pageSize"
+    [collectionSize]="collectionSize"
+    (pageChange)="getPagedSequences()"
+    [maxSize]="5"
+    [boundaryLinks]="true"
+    style="margin-bottom: 100px"
+  ></ngb-pagination>
+  <div class="container" style="text-align: center;">
+    <span class="loader" *ngIf="sequences.length == 0"></span>
+  </div>
+  
 </div>

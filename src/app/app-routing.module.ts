@@ -4,7 +4,6 @@ import { AmyloidWorkspaceComponent } from './amyloid/components/amyloid-workspac
 import { NotFoundComponent } from './amyloid/components/not-found/not-found.component';
 import { AmyloidDashboardComponent } from './amyloid/components/amyloid-dashboard/amyloid-dashboard.component';
 import { AmyloidWorkspaceDetailsComponent } from './amyloid/components/amyloid-workspace-details/amyloid-workspace-details.component';
-import { WorkspaceResolver } from './amyloid/resolvers/workspace.resolver';
 import { AmyloidWorkspaceSettingsComponent } from './amyloid/components/amyloid-workspace-settings/amyloid-workspace-settings.component';
 import { AuthGuard } from './amyloid/guards/auth.guard';
 import { AmyloidWorkspaceResultsComponent } from './amyloid/components/amyloid-workspace-results/amyloid-workspace-results.component';
@@ -27,30 +26,21 @@ const routes: Routes = [
     title: 'Workspaces - AmyloTool',
   },
   {
-    path: 'amyloid/:id',
+    path: 'amyloid/details',
     component: AmyloidWorkspaceDetailsComponent,
     title: 'Workspace details - AmyloTool',
-    resolve: {
-      workspace: WorkspaceResolver,
-    },
     canActivate: [AuthGuard],
   },
   {
-    path: 'amyloid/:id/settings',
+    path: 'amyloid/settings',
     component: AmyloidWorkspaceSettingsComponent,
     title: 'Workspace settings - AmyloTool',
-    resolve: {
-      workspace: WorkspaceResolver,
-    },
     canActivate: [AuthGuard],
   },
   {
     path: 'amyloid/:id/results',
     component: AmyloidWorkspaceResultsComponent,
     title: 'Workspace results - AmyloTool',
-    resolve: {
-      workspace: WorkspaceResolver,
-    },
     canActivate: [AuthGuard],
   },
   { path: 'not-found', component: NotFoundComponent, title: 'Not Found' },

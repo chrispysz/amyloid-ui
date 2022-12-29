@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AmyloidDashboardComponent } from './components/amyloid-dashboard/amyloid-dashboard.component';
 import { AmyloidWorkspaceComponent } from './components/amyloid-workspace/amyloid-workspace.component';
-import { WorkspaceService } from './services/workspace.service';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PredictionService } from './services/prediction.service';
@@ -37,7 +36,7 @@ import { AmyloidWorkspaceResultsComponent } from './components/amyloid-workspace
     RouterModule,
     NgbModule,
   ],
-  providers: [WorkspaceService, PredictionService, FileProcessingService],
+  providers: [PredictionService, FileProcessingService],
   exports: [
     AmyloidDashboardComponent,
     AmyloidWorkspaceComponent,

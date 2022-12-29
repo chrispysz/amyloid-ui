@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/internal/operators/map';
 import { Workspace } from '../../models/workspace';
-import { WorkspaceService } from '../../services/workspace.service';
 
 @Component({
   selector: 'app-amyloid-workspace-settings',
@@ -12,6 +11,7 @@ import { WorkspaceService } from '../../services/workspace.service';
 })
 export class AmyloidWorkspaceSettingsComponent implements OnInit {
   workspace!: Workspace;
+  isLoading: boolean = true;
 
   workspaceSettingsForm = new FormGroup({
     workspaceName: new FormControl('', [
@@ -24,23 +24,24 @@ export class AmyloidWorkspaceSettingsComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly workspaceService: WorkspaceService
   ) {}
 
   ngOnInit(): void {
-    this.route.data
-      .pipe(map((data) => data['workspace']))
-      .subscribe((result) => {
-        this.workspace = result;
-        this.workspaceSettingsForm.controls['workspaceName'].setValue(
-          this.workspace.name
-        );
-      });
+    // this.route.queryParams.subscribe((params) => {
+    //   let workspaceId = params['id'];
+    //   this.workspaceService.getWorkspace(workspaceId).then((workspace) => {
+    //     this.workspace = workspace;
+    //     this.isLoading = false;
+    //     this.workspaceSettingsForm.controls['workspaceName'].setValue(
+    //       this.workspace.name
+    //     );
+    //   });
+    // });
   }
 
   saveSettings(fields: any): void {
     this.workspace.name = fields.workspaceName;
-    this.workspaceService.update(this.workspace);
+ //   this.workspaceService.updateWorkspace(this.workspace);
   }
 
   deleteWorkspace(): void {
@@ -49,7 +50,7 @@ export class AmyloidWorkspaceSettingsComponent implements OnInit {
         `Are you sure you want to delete ${this.workspace.name}? This action cannot be undone.`
       )
     ) {
-      this.workspaceService.delete(this.workspace);
+    //  this.workspaceService.deleteWorkspace(this.workspace);
       this.router.navigate(['/amyloid/workspaces']);
     }
   }
