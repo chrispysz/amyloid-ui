@@ -45,11 +45,22 @@ export class AuthService {
       });
   }
 
-  loggedIn(): boolean {
+  userInSessionStorage(): boolean {
     return JSON.parse(sessionStorage.getItem('user')!) ? true : false;
   }
 
+  loggedIn(): boolean {
+    return this.auth.currentUser ? true : false;
+  }
+
   getUserId(): string {
-    return this.auth.currentUser!.uid
+    if (this.userInSessionStorage()) {
+      return JSON.parse(sessionStorage.getItem('user')!).uid;
+    } else if (this.loggedIn()) {
+      return this.auth.currentUser!.uid;
+    }
+    else {
+      return '';
+    }
   }
 }

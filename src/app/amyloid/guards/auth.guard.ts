@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | Promise<boolean> | boolean {
-    if (this.auth.loggedIn() !== true) {
+    if (this.auth.userInSessionStorage() !== true) {
       window.alert('Access Denied, Login is Required to Access This Page!');
       this.router.navigate(['/amyloid/dashboard']);
     }

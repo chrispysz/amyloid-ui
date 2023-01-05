@@ -14,7 +14,7 @@ export class AmyloidNavbarComponent implements OnInit {
   ngOnInit(): void {}
 
   loggedIn(): boolean {
-    return this.authService.loggedIn();
+    return this.authService.userInSessionStorage();
   }
 
   logOut() {

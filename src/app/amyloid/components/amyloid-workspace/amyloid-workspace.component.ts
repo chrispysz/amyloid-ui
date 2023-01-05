@@ -64,7 +64,7 @@ export class AmyloidWorkspaceComponent implements OnInit {
   }
 
   loggedIn() {
-    return this.authService.loggedIn();
+    return this.authService.userInSessionStorage();
   }
 
   logIn(values: any) {
@@ -92,7 +92,6 @@ export class AmyloidWorkspaceComponent implements OnInit {
       .result.then(
         (result) => {
           let wsId = Date.now().toString();
-          let savePath = this.authService.getUserId() + '/' + wsId;
 
           if (result.importedFile) {
             let workspace: Workspace = {
@@ -112,7 +111,7 @@ export class AmyloidWorkspaceComponent implements OnInit {
               lastModified: serverTimestamp(),
             };
 
-            this.createNewWorkspace(workspace, savePath, workspaceDbReference);
+            this.createNewWorkspace(workspace, wsId, workspaceDbReference);
           } else {
             let workspace: Workspace = {
               id: wsId,
@@ -126,7 +125,7 @@ export class AmyloidWorkspaceComponent implements OnInit {
               name: result.name,
               lastModified: serverTimestamp(),
             };
-            this.createNewWorkspace(workspace, savePath, workspaceDbReference);
+            this.createNewWorkspace(workspace, wsId, workspaceDbReference);
           }
           this.resetModalData();
         },

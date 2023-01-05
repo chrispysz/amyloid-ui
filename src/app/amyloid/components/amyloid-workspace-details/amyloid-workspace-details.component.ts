@@ -1,6 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, concatMap, from, map, throwError, timeout } from 'rxjs';
+import {
+  catchError,
+  concatMap,
+  from,
+  map,
+  of,
+  throwError,
+  timeout,
+} from 'rxjs';
 import { Sequence } from '../../models/sequence';
 import { PredictionService } from '../../services/prediction.service';
 import { PredictionResponse } from '../../models/predictionResponse';
@@ -14,6 +22,7 @@ import { ModelService } from '../../services/model.service';
 import { PredictedSubsequence } from '../../models/predictedSubsequence';
 import { FirestoreService } from '../../services/firestore.service';
 import { FileStorageService } from '../../services/file-storage.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-amyloid-workspace-details',
@@ -60,44 +69,46 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     private readonly firestoreService: FirestoreService,
     private readonly fileStorageService: FileStorageService,
     private readonly modelService: ModelService,
+    private readonly auth: AuthService,
     private readonly modalService: NgbModal,
     private readonly offcanvasService: NgbOffcanvas
   ) {}
 
   ngOnInit(): void {
+    if (!this.auth.loggedIn()) {
+      this.auth.logOut();
+    }
     this.route.queryParams.subscribe((params) => {
       let workspaceId = params['id'];
       this.workspaceId = workspaceId;
-      let user = JSON.parse(sessionStorage.getItem('user')!);
-      if (user && user['uid']) {
-        let loadPath = user['uid'] + '/' + workspaceId;
-        this.fileStorageService.loadWorkspace(loadPath).then((workspace) => {
-          this.workspace = workspace;
-          this.workspaceId = workspace.id;
-          this.sequences = workspace.sequences;
-          this.getPagedSequences();
-          this.collectionSize = this.sequences!.length;
-          this.processSteps =
-            this.predictionService.getDefaultPredictionSteps();
-          if (sessionStorage.getItem('selectedModel')) {
-            let foundSelectedModel = this.modelService
-              .getModels()
-              .find(
-                (m: ModelData) =>
-                  m.id == sessionStorage.getItem('selectedModel')
-              );
-            if (foundSelectedModel) {
-              this.currentSelectedModelForPredictions = foundSelectedModel.name;
-            }
+
+      this.fileStorageService.loadWorkspace(workspaceId).then((workspace) => {
+        this.workspace = workspace;
+        this.workspaceId = workspace.id;
+        this.sequences = workspace.sequences;
+        this.getPagedSequences();
+        this.collectionSize = this.sequences!.length;
+        this.processSteps = this.predictionService.getDefaultPredictionSteps();
+        if (sessionStorage.getItem('selectedModel')) {
+          let foundSelectedModel = this.modelService
+            .getModels()
+            .find(
+              (m: ModelData) => m.id == sessionStorage.getItem('selectedModel')
+            );
+          if (foundSelectedModel) {
+            this.currentSelectedModelForPredictions = foundSelectedModel.name;
           }
-        });
-      }
+        }
+      });
     });
   }
 
   getPagedSequences() {
-    // this.pagedSequences = this.workspaceService.getSequencesByPage(
-    //   this.page, this.pageSize, this.sequences!)
+    this.pagedSequences = this.fileStorageService.getSequencesByPage(
+      this.page,
+      this.pageSize,
+      this.sequences!
+    );
   }
 
   openEditModal(
@@ -116,32 +127,47 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
       .open(content, { ariaLabelledBy: 'modal-basic-title' })
       .result.then(
         (result) => {
-          // if (actionType == 'Edit') {
-          //   let seq = this.sequences!.find((s) => s.id == seqId)!;
-          //   seq.name =
-          //     result.sequenceIdentifier;
-          //   seq.value =
-          //     result.sequenceValue;
-          //   this.workspace.updated = serverTimestamp();
-          //   this.workspaceService.updateSequence(seq);
-          //   this.workspaceService.updateWorkspace(this.workspace);
-          // } else if (actionType == 'Add') {
-          //   let sequence: Sequence = {
-          //     id: Date.now().toString(),
-          //     workspaceId: this.workspace.id,
-          //     name: result.sequenceIdentifier,
-          //     value: result.sequenceValue,
-          //     modelPredictions: [],
-          //     predictLogs: [],
-          //   };
-          //   this.sequences?.push(sequence);
-          //   this.workspace.updated = serverTimestamp();
-          //   this.workspaceService.addSequences([sequence]);
-          //   this.workspaceService.updateWorkspace(this.workspace);
-          // }
+          if (actionType == 'Edit') {
+            let seq = this.workspace!.sequences.find((s) => s.id == seqId)!;
+            if (
+              seq.value != result.sequenceValue &&
+              confirm(
+                `Are you sure you want to edit this sequence? This will reset the predictions for this sequence.`
+              )
+            ) {
+              seq.value = result.sequenceValue;
+              seq.modelPredictions = [];
+              seq.predictLogs = [];
+            }
+            seq.name = result.sequenceIdentifier;
+          } else if (actionType == 'Add') {
+            let sequence: Sequence = {
+              id: Date.now().toString(),
+              name: result.sequenceIdentifier,
+              value: result.sequenceValue,
+              modelPredictions: [],
+              predictLogs: [],
+            };
+            this.workspace!.sequences?.push(sequence);
+          }
+          this.dbUpdate();
         },
         () => {}
       );
+  }
+
+  dbUpdate() {
+    this.firestoreService.get(this.workspaceId).then((dbRef) => {
+      this.fileStorageService.uploadWorkspace(
+        new Blob([JSON.stringify(this.workspace)], {
+          type: 'application/json',
+        }),
+        this.workspaceId
+      );
+
+      dbRef.lastModified = serverTimestamp();
+      this.firestoreService.update(dbRef);
+    });
   }
 
   openResultsModal(content: any, sequence: Sequence) {
@@ -179,9 +205,10 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
 
   deleteSequence(sequence: Sequence): void {
     if (confirm(`Are you sure you want to delete ${sequence.name}?`)) {
-      // this.workspaceService.deleteSequence(sequence);
-      // this.workspace.updated = serverTimestamp();
-      // this.workspaceService.updateWorkspace(this.workspace);
+      this.workspace!.sequences = this.workspace!.sequences.filter(
+        (s) => s.id != sequence.id
+      );
+      this.dbUpdate();
     }
   }
 
@@ -223,12 +250,15 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
 
         _sequences
           .pipe(
-            concatMap((sequence) =>
-              this.predictionService.predictFull(
+            concatMap((sequence) => {
+              if (sequence.modelPredictions.find((p) => p.model == model)) {
+                return of(null);
+              }
+              return this.predictionService.predictFull(
                 this.currentSelectedModelForPredictions,
                 sequence.value
-              )
-            ),
+              );
+            }),
             catchError((error) => {
               this.processSteps[1].status = 'FAILED';
               this.processSteps[1].notes[1] = 'Error during prediction';
@@ -237,31 +267,34 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             })
           )
           .subscribe((response: PredictionResponse) => {
-            let seq = this.sequences!.find(
-              (s) => s.id == this.sequences![currentIndex].id
-            )!;
-            let newState =
-              response.classification == 'Positive' ? 'POSITIVE' : 'NEGATIVE';
-            seq.modelPredictions.push({
-              model: model,
-              state: newState,
-            });
-            seq.predictLogs.push({
-              model: model,
-              log: response.result.toString().replace(/'/g, '"'),
-            });
+            if (response) {
+              let seq = this.sequences!.find(
+                (s) => s.id == this.sequences![currentIndex].id
+              )!;
+              let newState =
+                response.classification == 'Positive' ? 'POSITIVE' : 'NEGATIVE';
+              seq.modelPredictions.push({
+                model: model,
+                state: newState,
+              });
+              seq.predictLogs.push({
+                model: model,
+                log: response.result.toString().replace(/'/g, '"'),
+              });
+            }
 
             if (currentIndex == lastIndex) {
               this.processSteps[1].status = 'SUCCESSFUL';
               this.processSteps[2].status = 'IN_PROGRESS';
               this.sleep(1800).then(() => {
-                // this.workspaceService.updateSequence(seq);
-                // this.workspace.updated = serverTimestamp();
-                // this.workspaceService.updateWorkspace(this.workspace);
+                this.dbUpdate();
                 this.processSteps[2].status = 'SUCCESSFUL';
                 this.resetPredictionProgress();
               });
             } else {
+              if (currentIndex > 0 && currentIndex % 10 == 0) {
+                this.dbUpdate();
+              }
               currentIndex++;
               this.idBeingPredicted = this.sequences![currentIndex].id;
               this.processSteps[1].notes[0] = `Predicting ${
@@ -313,13 +346,19 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
             model: model,
             log: response.result.toString().replace(/'/g, '"'),
           });
-          // this.workspaceService.updateSequence(seq);
-          // this.workspace.updated = serverTimestamp();
-          // this.workspaceService.updateWorkspace(this.workspace);
+          this.dbUpdate();
 
           this.resetPredictionProgress();
         });
     });
+  }
+
+  hasPredictionsForCurrentModel(sequence: Sequence): boolean {
+    return sequence.modelPredictions.find(
+      (p) => p.model == this.currentSelectedModelForPredictions
+    )
+      ? true
+      : false;
   }
 
   private resetPredictionProgress(): void {

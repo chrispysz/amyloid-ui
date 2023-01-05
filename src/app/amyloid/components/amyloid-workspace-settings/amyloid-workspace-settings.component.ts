@@ -1,8 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map } from 'rxjs/internal/operators/map';
 import { Workspace } from '../../models/workspace';
+import { WorkspaceDbReference } from '../../models/workspace-db-reference';
+import { FileStorageService } from '../../services/file-storage.service';
+import { FirestoreService } from '../../services/firestore.service';
 
 @Component({
   selector: 'app-amyloid-workspace-settings',
@@ -10,7 +12,7 @@ import { Workspace } from '../../models/workspace';
   styleUrls: ['./amyloid-workspace-settings.component.scss'],
 })
 export class AmyloidWorkspaceSettingsComponent implements OnInit {
-  workspace!: Workspace;
+  workspace: WorkspaceDbReference | undefined;
   isLoading: boolean = true;
 
   workspaceSettingsForm = new FormGroup({
@@ -24,33 +26,41 @@ export class AmyloidWorkspaceSettingsComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly firestoreService: FirestoreService,
+    private readonly fileStorageService: FileStorageService
   ) {}
 
   ngOnInit(): void {
-    // this.route.queryParams.subscribe((params) => {
-    //   let workspaceId = params['id'];
-    //   this.workspaceService.getWorkspace(workspaceId).then((workspace) => {
-    //     this.workspace = workspace;
-    //     this.isLoading = false;
-    //     this.workspaceSettingsForm.controls['workspaceName'].setValue(
-    //       this.workspace.name
-    //     );
-    //   });
-    // });
+    this.route.queryParams.subscribe((params) => {
+      let workspaceId = params['id'];
+      this.firestoreService.get(workspaceId).then((workspace) => {
+        this.workspace = workspace;
+        this.isLoading = false;
+        this.workspaceSettingsForm.controls['workspaceName'].setValue(
+          this.workspace.name
+        );
+      });
+    });
   }
 
-  saveSettings(fields: any): void {
-    this.workspace.name = fields.workspaceName;
- //   this.workspaceService.updateWorkspace(this.workspace);
+  async saveSettings(fields: any) {
+    let fullWorkspace = await this.fileStorageService.loadWorkspace(this.workspace!.id);
+    this.workspace!.name = fields.workspaceName;
+    fullWorkspace.name = fields.workspaceName;
+    this.fileStorageService.uploadWorkspace(new Blob([JSON.stringify(fullWorkspace)], {
+      type: 'application/json',
+    }), this.workspace!.id);
+    this.firestoreService.update(this.workspace!);
   }
 
   deleteWorkspace(): void {
     if (
       confirm(
-        `Are you sure you want to delete ${this.workspace.name}? This action cannot be undone.`
+        `Are you sure you want to delete ${this.workspace!.name}? This action cannot be undone.`
       )
     ) {
-    //  this.workspaceService.deleteWorkspace(this.workspace);
+     this.fileStorageService.deleteWorkspace(this.workspace!.id);
+     this.firestoreService.delete(this.workspace!.id);
       this.router.navigate(['/amyloid/workspaces']);
     }
   }

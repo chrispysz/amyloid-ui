@@ -224,7 +224,7 @@
                     currentSelectedModelForPredictions
                   )
                 "
-                [disabled]="predictionInProgress"
+                [disabled]="predictionInProgress || hasPredictionsForCurrentModel(sequence)"
                 style="
                   outline: none;
                   border: none;
