@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.0](https://github.com/chrispysz/amyloid-ui/compare/v0.10.0...v0.11.0) (2023-01-18)
+
+
+### Features
+
+* color support, cancel button, db usage optimization ([4602b32](https://github.com/chrispysz/amyloid-ui/commit/4602b321690c3d39817f4d63ab27dc79dc05772a))
+
+
+### Bug Fixes
+
+* add update slow-down ([6cce19a](https://github.com/chrispysz/amyloid-ui/commit/6cce19a9745f6a79d829db89edfd39be3266d73f))
+
 ## [0.10.0](https://github.com/chrispysz/amyloid-ui/compare/v0.9.0...v0.10.0) (2023-01-05)
 
 
