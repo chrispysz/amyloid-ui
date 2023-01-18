@@ -329,7 +329,11 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit, OnDestroy {
                 this.resetPredictionProgress();
               });
             } else {
-              if (currentIndex > 0 && currentIndex % 10 == 0) {
+              if (
+                (currentIndex <= 10 && currentIndex % 10 == 0) ||
+                (currentIndex <= 100 && currentIndex % 100 == 0) ||
+                currentIndex % 1000 == 0
+              ) {
                 this.dbUpdate();
               }
               currentIndex++;
