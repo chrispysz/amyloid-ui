@@ -49,6 +49,31 @@ export class FileStorageService {
     );
   }
 
+  uploadWorkspacePredictions(file: Blob, workspaceId: string) {
+    const storageRef = ref(
+      this.storage,
+      `workspaces/${this.auth.getUserId()}/${workspaceId}_predictions`
+    );
+    const uploadTask = uploadBytesResumable(storageRef, file);
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      },
+      (error) => {
+        console.log(error);
+        this.toastr.error(`Workspace failed during update`);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          console.log('File available at', downloadURL);
+        });
+        this.toastr.success(`Workspace updated successfully`);
+      }
+    );
+  }
+
   deleteWorkspace(id: string) {
     const storageRef = ref(
       this.storage,

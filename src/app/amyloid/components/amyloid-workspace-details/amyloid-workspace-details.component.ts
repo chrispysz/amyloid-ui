@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   catchError,
   concatMap,
   from,
-  map,
   of,
+  Subject,
+  Subscription,
+  takeUntil,
   throwError,
   timeout,
 } from 'rxjs';
@@ -23,13 +25,14 @@ import { PredictedSubsequence } from '../../models/predictedSubsequence';
 import { FirestoreService } from '../../services/firestore.service';
 import { FileStorageService } from '../../services/file-storage.service';
 import { AuthService } from '../../services/auth.service';
+import { WorkspaceHolderService } from '../../services/workspace-holder.service';
 
 @Component({
   selector: 'app-amyloid-workspace-details',
   templateUrl: './amyloid-workspace-details.component.html',
   styleUrls: ['./amyloid-workspace-details.component.scss'],
 })
-export class AmyloidWorkspaceDetailsComponent implements OnInit {
+export class AmyloidWorkspaceDetailsComponent implements OnInit, OnDestroy {
   page = 1;
   pageSize = 50;
   collectionSize!: number;
@@ -63,44 +66,64 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     ]),
   });
 
+  private subscription$ = new Subscription();
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly predictionService: PredictionService,
     private readonly firestoreService: FirestoreService,
     private readonly fileStorageService: FileStorageService,
+    private readonly workspaceService: WorkspaceHolderService,
     private readonly modelService: ModelService,
     private readonly auth: AuthService,
     private readonly modalService: NgbModal,
     private readonly offcanvasService: NgbOffcanvas
   ) {}
 
+  ngOnDestroy(): void {
+    this.subscription$.unsubscribe();
+  }
+  cancelPrediction() {
+    this.subscription$.unsubscribe();
+    this.resetPredictionProgress();
+  }
+
   ngOnInit(): void {
-    if (!this.auth.loggedIn()) {
+    if (!this.auth.loggedIn() && !this.auth.userInSessionStorage()) {
       this.auth.logOut();
     }
     this.route.queryParams.subscribe((params) => {
       let workspaceId = params['id'];
       this.workspaceId = workspaceId;
 
-      this.fileStorageService.loadWorkspace(workspaceId).then((workspace) => {
-        this.workspace = workspace;
-        this.workspaceId = workspace.id;
-        this.sequences = workspace.sequences;
-        this.getPagedSequences();
-        this.collectionSize = this.sequences!.length;
-        this.processSteps = this.predictionService.getDefaultPredictionSteps();
-        if (sessionStorage.getItem('selectedModel')) {
-          let foundSelectedModel = this.modelService
-            .getModels()
-            .find(
-              (m: ModelData) => m.id == sessionStorage.getItem('selectedModel')
-            );
-          if (foundSelectedModel) {
-            this.currentSelectedModelForPredictions = foundSelectedModel.name;
-          }
-        }
-      });
+      if (this.workspaceService.getWorkspace()) {
+        this.initializePage(this.workspaceService.getWorkspace()!);
+      } else {
+        this.fileStorageService.loadWorkspace(workspaceId).then((workspace) => {
+          this.workspaceService.setWorkspace(workspace);
+          this.initializePage(workspace);
+        });
+      }
     });
+  }
+
+  initializePage(workspace: Workspace) {
+    this.workspace = workspace;
+    this.workspaceId = workspace.id;
+    this.sequences = workspace.sequences;
+    this.getPagedSequences();
+    this.collectionSize = this.sequences!.length;
+    this.processSteps = this.predictionService.getDefaultPredictionSteps();
+    if (sessionStorage.getItem('selectedModel')) {
+      let foundSelectedModel = this.modelService
+        .getModels()
+        .find(
+          (m: ModelData) => m.id == sessionStorage.getItem('selectedModel')
+        );
+      if (foundSelectedModel) {
+        this.currentSelectedModelForPredictions = foundSelectedModel.name;
+      }
+    }
   }
 
   getPagedSequences() {
@@ -194,6 +217,20 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
     return subseqs;
   }
 
+  getColoredRepresentation(sequence: Sequence) {
+    let coloredSequence = sequence.value;
+    let subseqs = this.getPredictionsArrayFromLogs(sequence);
+    subseqs.forEach((subseq) => {
+      if (parseFloat(subseq.prediction) > 0.5) {
+        coloredSequence = coloredSequence.replace(
+          subseq.sequence,
+          `<span class="text-success">${subseq.sequence}</span>`
+        );
+      }
+    });
+    return coloredSequence;
+  }
+
   openPredictionModelsOffCanvas(content: any) {
     this.offcanvasService
       .open(content, { ariaLabelledBy: 'offcanvas-basic-title' })
@@ -248,7 +285,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
         this.processSteps[1].notes[1] =
           this.predictionProgress.toString() + '% done';
 
-        _sequences
+        this.subscription$ = _sequences
           .pipe(
             concatMap((sequence) => {
               if (sequence.modelPredictions.find((p) => p.model == model)) {
@@ -363,6 +400,7 @@ export class AmyloidWorkspaceDetailsComponent implements OnInit {
 
   private resetPredictionProgress(): void {
     this.predictionInProgress = false;
+    this.idBeingPredicted = '';
     this.predictionProgress = 0;
   }
 

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ProcessStep } from '../../models/processStep';
 
 @Component({
@@ -8,6 +8,7 @@ import { ProcessStep } from '../../models/processStep';
 })
 export class AmyloidPredictionProgressComponent implements OnInit {
   @Input() steps: ProcessStep[] = [];
+  @Output() cancelled = new EventEmitter<void>();
 
   constructor() {}
 
@@ -55,6 +56,10 @@ export class AmyloidPredictionProgressComponent implements OnInit {
       default:
         return '';
     }
+  }
+
+  cancel() {
+    this.cancelled.emit();
   }
 
   stepStarted(step: ProcessStep): boolean {

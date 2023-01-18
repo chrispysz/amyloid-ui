@@ -101,6 +101,7 @@
   <app-amyloid-prediction-progress
     *ngIf="fullPredictionInProgress"
     [steps]="processSteps"
+    (cancelled)="cancelPrediction()"
   >
   </app-amyloid-prediction-progress>
   <button
@@ -161,23 +162,6 @@
     style="
       font-weight: bold;
       border-radius: 0px;
-      min-width: 150px;
-      margin-right: 1px;
-    "
-    name="Results"
-    [disabled]="predictionInProgress"
-    [routerLink]="['./results']"
-  >
-    <span class="btn-label" style="font-weight: bold"
-      ><em class="bi bi-file-bar-graph"></em
-    ></span>
-    Results
-  </button>
-  <button
-    class="btn btn-secondary"
-    style="
-      font-weight: bold;
-      border-radius: 0px;
       border-top-right-radius: 15px;
       min-width: 150px;
     "
@@ -224,7 +208,10 @@
                     currentSelectedModelForPredictions
                   )
                 "
-                [disabled]="predictionInProgress || hasPredictionsForCurrentModel(sequence)"
+                [disabled]="
+                  predictionInProgress ||
+                  hasPredictionsForCurrentModel(sequence)
+                "
                 style="
                   outline: none;
                   border: none;
@@ -332,7 +319,7 @@
             <td
               style="word-wrap: break-word; min-width: 200px; max-width: 200px"
             >
-              {{ sequence.value }}
+              <p [innerHTML]="getColoredRepresentation(sequence)"></p>
             </td>
           </tr>
         </ng-container>
@@ -349,8 +336,7 @@
     [boundaryLinks]="true"
     style="margin-bottom: 100px"
   ></ngb-pagination>
-  <div class="container" style="text-align: center;">
+  <div class="container" style="text-align: center">
     <span class="loader" *ngIf="sequences.length == 0"></span>
   </div>
-  
 </div>
